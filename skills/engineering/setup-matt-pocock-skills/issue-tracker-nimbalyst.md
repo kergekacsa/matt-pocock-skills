@@ -37,9 +37,15 @@ When you finish work on an issue, **a comment is not an update.** These are diff
    - **Change `status`** as work progresses — `in-progress` when you start, `in-review` when the code is done and awaiting verification. **Never set `done`/`completed` without explicit user approval** — only the user decides when work is truly done.
    - **Tick acceptance-criteria checkboxes.** There is no per-checkbox toggle: `description` *replaces* the whole body, so re-send the full description identical except `[ ]` → `[x]` on the items that are genuinely verified. Don't over-claim — leave boxes that still need a manual/human step unchecked.
 3. **`mcp__nimbalyst-session-naming__update_session_meta`** (and `update_session_board`) update **this chat's card on the Nimbalyst kanban board** — its name, tags, and phase. This is the *session*, **not** the tracker issue. Updating session meta changes nothing on the issue.
-4. **Roll the change up to the parent.** When an item has a parent (e.g. a `task` whose body names a parent `plan`), finishing the child usually moves the parent too: a plan whose first child just shipped should move from `ready-for-development` to `in-development`; a plan whose last child is done is a candidate for `in-review`/`completed` (still needs explicit user approval). Note that types have *different* status vocabularies — a `plan` runs `draft → ready-for-development → in-development → in-review → completed`, a `task` runs `to-do → in-progress → in-review → done` — so check `tracker_list_types` before setting a parent's status. Parent issues are not auto-updated when a child changes; you must do it.
+4. **Roll the change up to the parent.** When an item has a parent (e.g. a `task` whose body names a parent `plan`), finishing the child usually moves the parent too. On the parent, update **all** of the following that apply:
+   - **`status`** — a plan whose first child just shipped should move from `ready-for-development` to `in-development`; a plan whose last child is done is a candidate for `in-review`/`completed` (still needs explicit user approval). Note that types have *different* status vocabularies — a `plan` runs `draft → ready-for-development → in-development → in-review → completed`, a `task` runs `to-do → in-progress → in-review → done` — so check `tracker_list_types` before setting a parent's status.
+   - **`progress`** — recalculate as `completed_children / total_children * 100`. Use `tracker_list` to count children by status first. Round to the nearest whole number.
+   - **`startDate`** — set to today if the parent has no start date yet (i.e. this is the first child starting or completing).
+   - **`tags`** — update the triage tag if the parent's state has changed (e.g. swap `ready-for-agent` → `in-progress` once work is underway).
 
-**Closing ritual** for any issue you worked: **(a)** comment what you did, **(b)** `tracker_update` the issue's `status`, **(c)** `tracker_update` the `description` to tick the verified boxes, **(d)** `tracker_update` the **parent's** `status` if this child changes where the parent sits.
+   Parent issues are not auto-updated when a child changes; you must do it.
+
+**Closing ritual** for any issue you worked: **(a)** comment what you did, **(b)** `tracker_update` the issue's `status`, **(c)** `tracker_update` the `description` to tick the verified boxes, **(d)** `tracker_update` the **parent's** `status`, `progress`, `startDate`, and `tags` as needed.
 
 ## ⚠️ `update_session_meta` always requires updating the issue too
 
