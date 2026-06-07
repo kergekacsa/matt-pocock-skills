@@ -6,14 +6,14 @@ Issues, tasks, ideas, features, decisions, and plans for this repo live in the *
 
 Use the most specific built-in type:
 
-| Skill term                   | Tracker type |
-| ---------------------------- | ------------ |
-| bug / defect                 | `bug`        |
-| task / chore                 | `task`       |
-| feature request              | `feature`    |
-| idea / spike                 | `idea`       |
-| PRD / multi-step plan        | `plan`       |
-| architectural decision / ADR | `decision`   |
+| Skill term                          | Tracker type |
+| ----------------------------------- | ------------ |
+| bug / defect                        | `bug`        |
+| task / chore                        | `task`       |
+| feature request                     | `feature`    |
+| idea / spike                        | `idea`       |
+| PRD / multi-step plan               | `plan`       |
+| architectural decision / ADR        | `decision`   |
 
 All types support a `tags` array (used for triage state — see `triage-labels.md`) and a `status` (workflow state — for a `task` that's `to-do` → `in-progress` → `in-review` → `done`). Run `tracker_list_types` to see the exact statuses a given type allows.
 
@@ -30,16 +30,24 @@ All types support a `tags` array (used for triage state — see `triage-labels.m
 
 ## ⚠️ Don't forget to update the issue again!
 
-When you finish work on an issue, **a comment is not an update.** These are three *different* systems and it's easy to think you've updated the tracker when you haven't:
+When you finish work on an issue, **a comment is not an update.** These are different systems and it's easy to think you've updated the tracker when you haven't:
 
 1. **`tracker_add_comment`** appends a comment. It does **not** change the issue's `status` and does **not** tick the acceptance-criteria checkboxes in the body. The issue header looks unchanged — the comment lives in a separate tab.
 2. **`tracker_update`** is what actually moves the issue. Use it to:
    - **Change `status`** as work progresses — `in-progress` when you start, `in-review` when the code is done and awaiting verification. **Never set `done`/`completed` without explicit user approval** — only the user decides when work is truly done.
    - **Tick acceptance-criteria checkboxes.** There is no per-checkbox toggle: `description` *replaces* the whole body, so re-send the full description identical except `[ ]` → `[x]` on the items that are genuinely verified. Don't over-claim — leave boxes that still need a manual/human step unchecked.
 3. **`mcp__nimbalyst-session-naming__update_session_meta`** (and `update_session_board`) update **this chat's card on the Nimbalyst kanban board** — its name, tags, and phase. This is the *session*, **not** the tracker issue. Updating session meta changes nothing on the issue.
-4. **Roll the change up to the parent.** When an item has a parent (e.g. a `task` whose body names a parent `plan`), finishing the child usually moves the parent too: a plan whose first child just shipped should leave `ready-for-development` for `in-development`; a plan whose last child is done is a candidate for `in-review`/`completed` (still needs explicit user approval for `done`/`completed`). Note that types have *different* status vocabularies — a `plan` runs `draft → ready-for-development → in-development → in-review → completed`, a `task` runs `to-do → in-progress → in-review → done` — so check `tracker_list_types` before setting a parent's status. Parent issues are not auto-updated when a child changes; you must do it.
+4. **Roll the change up to the parent.** When an item has a parent (e.g. a `task` whose body names a parent `plan`), finishing the child usually moves the parent too: a plan whose first child just shipped should move from `ready-for-development` to `in-development`; a plan whose last child is done is a candidate for `in-review`/`completed` (still needs explicit user approval). Note that types have *different* status vocabularies — a `plan` runs `draft → ready-for-development → in-development → in-review → completed`, a `task` runs `to-do → in-progress → in-review → done` — so check `tracker_list_types` before setting a parent's status. Parent issues are not auto-updated when a child changes; you must do it.
 
-So the closing ritual for any issue you worked: **(a)** comment what you did, **(b)** `tracker_update` the issue's `status`, **(c)** `tracker_update` the `description` to tick the verified boxes, **(d)** `tracker_update` the **parent's** `status` if this child changes where the parent sits. Skipping any of these leaves the tracker looking untouched at a glance.
+**Closing ritual** for any issue you worked: **(a)** comment what you did, **(b)** `tracker_update` the issue's `status`, **(c)** `tracker_update` the `description` to tick the verified boxes, **(d)** `tracker_update` the **parent's** `status` if this child changes where the parent sits.
+
+## ⚠️ `update_session_meta` always requires updating the issue too
+
+**Every `update_session_meta` call that reflects completed work must be accompanied by the closing ritual above — in the same response, before or after the session meta call.**
+
+- `update_session_meta` and `tracker_update` are **not alternatives**; they update different things. One without the other leaves the tracker stale.
+- After updating the child issue, **check the parent issue(s)**. If completing this child advances the parent's state, update the parent's `status` and/or tick its checkboxes. If not, no call needed — but consciously verify rather than skip.
+- The pattern to enforce: issue update → parent check → session meta. In that order, in one response, every time.
 
 ## When a skill says "publish to the issue tracker"
 
