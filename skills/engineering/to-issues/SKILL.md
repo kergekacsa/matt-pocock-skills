@@ -33,12 +33,17 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 
 ### 4. Quiz the user
 
-Present the proposed breakdown as a numbered list. For each slice, show:
+Present the proposed breakdown as a markdown table so the same block can be reused in step 6. Use these columns:
 
+| Issue | Title | Type | Label | Blocked by | User stories |
+|-------|-------|------|-------|------------|--------------|
+
+- **Issue**: the tracker identifier once published; before publishing, use a placeholder (slice 1, 2, 3…)
 - **Title**: short descriptive name
 - **Type**: HITL / AFK
-- **Blocked by**: which other slices (if any) must complete first
-- **User stories covered**: which user stories this addresses (if the source material has them)
+- **Label**: the triage label that will be applied (`ready-for-agent`, `hitl`, …)
+- **Blocked by**: which other slices must complete first; use `—` for none
+- **User stories**: which user stories this addresses (story numbers, if the source material has them)
 
 Ask the user:
 
@@ -80,4 +85,28 @@ Or "None - can start immediately" if no blockers.
 
 </issue-template>
 
-Do NOT close or modify any parent issue.
+### 6. Append the dependency map to the PRD ticket
+
+Only do this if the source was an existing PRD / parent issue (i.e. the user passed an issue reference in step 1). If the breakdown came from raw conversation context with no parent ticket, skip this step — there is nothing to append to.
+
+Run this AFTER the issues are published, so the table can reference real issue identifiers.
+
+Append a `## Dependency map` section to the **end** of the PRD ticket's body. Use a story-traceability variant of the step 4 table — **add** the `User stories` column (mapped against the PRD's own user-story list, so orphan stories become visible) and **drop** the `Label` column (it lives on each issue and is not a PRD-level concern):
+
+| Issue | Title | Type | Blocked by | User stories |
+|-------|-------|------|------------|--------------|
+
+Below the table, include a Mermaid dependency graph so the shape of the DAG (roots, leaves, depth) is readable at a glance:
+
+```mermaid
+graph TD
+  NIM-2 --> NIM-4
+  NIM-2 & NIM-3 --> NIM-6
+```
+
+This edit is append-only and idempotent:
+
+- Do NOT alter the rest of the PRD body, change its status, or close it.
+- If a `## Dependency map` section already exists (e.g. on a re-run), replace it in place rather than appending a duplicate.
+
+Do NOT close the parent issue or alter its existing content. The only permitted modification is appending (or replacing) the `## Dependency map` section described above.
