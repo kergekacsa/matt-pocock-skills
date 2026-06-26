@@ -1,1 +1,14 @@
-node_modules
+# Claude Code session and memory data
+agent-memory/
+todos/
+.cache/
+
+# Local settings override (credentials, personal paths)
+settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (upstream versioning tooling)
+node_modules/
