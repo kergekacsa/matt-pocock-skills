@@ -106,7 +106,7 @@ Render **every concern as a bullet — never a code block.** Under Critical and 
 
 Assumptions, Blind Spots, and Hallucination Risk Flags are plain one-line bullets, one per item.
 
-For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `~/.claude/skills/devils-advocate/references/visual-formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule above overrides it for concern items.
+For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `~/.claude/references/formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule above overrides it for concern items.
 
 ---
 
