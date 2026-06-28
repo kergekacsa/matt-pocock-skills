@@ -55,7 +55,7 @@ This step has two halves. **Run** the non-mutating verification yourself (items 
 Run these now — no asking, **unless** they already ran successfully after the last meaningful change this session. If skipping, say so explicitly and state why (e.g. "Tests passed at 14:32 after the last code change — not re-running").
 
 1. **Tests** — Run the relevant test suite and record the result. If running is genuinely blocked (e.g. Docker/DB not up), say so and mark ❓ — don't fabricate a pass.
-2. **Devil's advocate** — Run `/devils-advocate` (or `/da-review`) on this session's work and capture its findings.
+2. **Devil's advocate** — Run the `/da-review` skill (not the `devils-advocate` agent — the skill keeps the output visible and in context). Provide it with the issue/task and acceptance criteria gathered in Step 1 **and** all session changes, so it can assess correctness against intent, not just internal code quality. Capture its findings.
 3. **Brooks decay scan (advisory)** — Run `/brooks-review` on this session's work (and `/brooks-test` when tests or test files changed) and capture its findings. Treat these as **advisory** — report them in Step 4, but unlike tests and the devil's advocate they do **not** block wrap-up unless they surface a genuine defect.
 
 Assess these read-only:
@@ -85,7 +85,7 @@ These are **blockers**, not close-out chores. The issue is not finished, so do *
 > 1. … 2. …
 > Want me to fix them? [ ] fix all · [ ] fix #1 only · [ ] not now
 
-Fixing is a mutating action, so it happens only after the user says yes — then hand off to the right flow (`/tdd`, `/devils-advocate`'s fix pass, a direct fix). After fixes land, verification re-runs and the wrap-up continues. Until then, the commit/tracker steps stay off the table.
+Fixing is a mutating action, so it happens only after the user says yes — then hand off to the right flow (`/tdd`, `/da-review`'s fix pass, a direct fix). After fixes land, verification re-runs and the wrap-up continues. Until then, the commit/tracker steps stay off the table.
 
 ### Case B — tests green and devil's advocate clean
 

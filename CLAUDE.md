@@ -85,3 +85,9 @@ Delegate to a specialist subagent (via the Agent tool) for non-trivial work in a
 Fallbacks: `general-purpose` when no specialist matches; `Explore` for read-only fan-out search; `Plan` for implementation planning; browse `agents/` for non-engineering roles (product, marketing, analytics, research, UX).
 
 For the full language/framework/domain → specialist mapping (~55 agents across languages, frontend, backend, DevOps, data, security, quality, and tooling), see [references/agent-routing.md](references/agent-routing.md).
+
+## Devil's-advocate output
+
+When a devil's-advocate / DA review runs — via the `/da-review` (or `devils-advocate`) skill **or** the `devils-advocate` Agent — reproduce its **full report verbatim** in chat, in the canonical finding format (per finding: *Severity · blocking? / Symptom / Why it's wrong / Evidence `file:line` / Suggested fix*, plus the "what holds up", strongest-counterargument, and verdict sections), **before** any triage, agreement, or summary of your own. The subagent route returns the report to you as a hidden tool result; surfacing it verbatim is mandatory, not optional. Only after the verbatim report may you add your own assessment, clearly separated under its own heading.
+
+Prefer running DA as the in-context `/da-review` skill over the isolated `devils-advocate` Agent, so its output is part of the visible conversation by default. Use the isolated Agent only when you specifically need its separate context or tools — and the verbatim-surfacing rule above still applies.
