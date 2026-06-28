@@ -43,6 +43,7 @@ Present a short, factual summary in two parts:
 
 - **What was done** — the concrete changes, grouped logically (not a raw file list). Reference files as clickable links and commits by hash.
 - **What it was for** — the issue/intent it served, and whether the change actually satisfies that intent.
+- **Where it went sideways** — wrong turns, disproven assumptions, or corrections the user had to make this session. State them plainly; a misconception that survived into a commit or a doc is a defect. If one traces back to a missing or misleading doc, carry it into the Documentation check as a fix to propose.
 
 Keep it tight. The user was there; this is a confirmation, not a retelling.
 
@@ -58,7 +59,7 @@ Run these now — no asking, **unless** they already ran successfully after the 
 Assess these read-only:
 
 3. **Commit hygiene** — Is this session's work committed? Critically: does the commit (or a proposed commit) contain **only this session's changes** and not pre-existing uncommitted files? Is anything from this session still uncommitted?
-4. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md, inline comments, API docs, and any HTML pages. Outdated documentation is a bug.
+4. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
 5. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
 6. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
 
