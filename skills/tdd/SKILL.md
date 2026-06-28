@@ -84,6 +84,7 @@ Rules:
 - Only enough code to pass current test
 - Don't anticipate future tests
 - Keep tests focused on observable behavior
+- Run typechecking and the single test file for the behavior each cycle
 
 ### 4. Refactor
 
@@ -96,6 +97,13 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 - [ ] Run tests after each refactor step
 
 **Never refactor while RED.** Get to GREEN first.
+
+### 5. Wrap up
+
+Once every behavior is implemented and all tests are green:
+
+- [ ] Run the full test suite once (single test files suffice during the loop)
+- [ ] Run `/da-review` on the finished work
 
 ## Checklist Per Cycle
 

@@ -32,7 +32,6 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 - **[tdd](./skills/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop.
 - **[domain-modeling](./skills/domain-modeling/SKILL.md)** — Build and sharpen a project's domain model; update `CONTEXT.md` and ADRs inline.
 - **[codebase-design](./skills/codebase-design/SKILL.md)** — Shared vocabulary for designing deep modules.
-- **[implement](./skills/implement/SKILL.md)** — Implement a PRD or issue end-to-end.
 - **[resolving-merge-conflicts](./skills/resolving-merge-conflicts/SKILL.md)** — Resolve in-progress git merge/rebase conflicts.
 
 **Productivity**
