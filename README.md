@@ -64,6 +64,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 Shared reference files loaded by skills and referenced in `CLAUDE.md`:
 
 - **[formatting.md](./references/formatting.md)** — Visual formatting, Mermaid guidelines, and Markdown style rules for all output.
+- **[agent-routing.md](./references/agent-routing.md)** — Full language/framework/domain → specialist subagent mapping, linked from the Agent routing section of `CLAUDE.md`.
 
 ## Sources
 
