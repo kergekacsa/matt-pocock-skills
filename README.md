@@ -50,6 +50,17 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 - **[wrap-up](./skills/wrap-up/SKILL.md)** — Close out a work session: summarise, verify, audit commit hygiene.
 - **[claude-md-optimizer](./skills/claude-md-optimizer/SKILL.md)** — Slim oversized agent-instruction files (CLAUDE.md / AGENTS.md / copilot-instructions.md) via progressive disclosure, with zero information loss.
 
+**Codebase health (Brooks-Lint)**
+
+Book-grounded code-review skills that diagnose decay against twelve classic engineering books. They share a single framework in [`skills/_shared/`](./skills/_shared/) (decay-risk definitions, source coverage, remedy guide), so each skill stays thin.
+
+- **[brooks-review](./skills/brooks-review/SKILL.md)** — PR/diff review: Symptom → Source → Consequence → Remedy. Invoked by `wrap-up` and available to `aaa`.
+- **[brooks-audit](./skills/brooks-audit/SKILL.md)** — Map module dependencies and architecture; also onboarding tours. Feeds `improve-codebase-architecture`.
+- **[brooks-debt](./skills/brooks-debt/SKILL.md)** — Classify and prioritise tech debt into a refactoring roadmap.
+- **[brooks-test](./skills/brooks-test/SKILL.md)** — Diagnose test-suite quality (brittleness, mock abuse, coverage illusion). Invoked at the `tdd` refactor step.
+- **[brooks-health](./skills/brooks-health/SKILL.md)** — Composite 0–100 dashboard across all dimensions.
+- **[brooks-sweep](./skills/brooks-sweep/SKILL.md)** — Run every check and auto-apply the safe fixes.
+
 ### `agents/`
 
 100+ specialized subagents covering engineering, infrastructure, data, security, and product roles. The bulk are imported from [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — browse `agents/` for the full list.
@@ -59,6 +70,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 ### `commands/`
 
 - **[da-review](./commands/da-review.md)** — `/da-review` entry point for the devils-advocate skill.
+- **brooks-{[review](./commands/brooks-review.md), [audit](./commands/brooks-audit.md), [debt](./commands/brooks-debt.md), [test](./commands/brooks-test.md), [health](./commands/brooks-health.md), [sweep](./commands/brooks-sweep.md)}** — `/brooks-*` entry points for the Brooks-Lint codebase-health skills.
 
 ### `references/`
 
@@ -75,6 +87,7 @@ This template draws on several upstream projects:
 - **[VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents)** — Source of the 100+ specialized subagents in `agents/`.
 - **[user538295/claude_goodies](https://github.com/user538295/claude_goodies)** — Source of the devils-advocate agent and skill, the `/da-review` and review commands, and several workflow skills.
 - **[wrsmith108/claude-md-optimizer](https://github.com/wrsmith108/claude-md-optimizer)** — Source of the `claude-md-optimizer` skill in `skills/`.
+- **[hyhmrright/brooks-lint](https://github.com/hyhmrright/brooks-lint)** (MIT) — Source of the `brooks-*` codebase-health skills, their shared framework in `skills/_shared/`, and the `/brooks-*` commands.
 
 ## Glossary
 

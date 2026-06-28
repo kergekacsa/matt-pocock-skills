@@ -95,6 +95,7 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 - [ ] Apply SOLID principles where natural
 - [ ] Consider what new code reveals about existing code
 - [ ] Run tests after each refactor step
+- [ ] Run `/brooks-test` on the touched tests to catch brittleness, mock abuse, and coverage illusions before moving on
 
 **Never refactor while RED.** Get to GREEN first.
 

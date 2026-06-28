@@ -19,6 +19,8 @@ This command is _informed_ by the project's domain model and built on a shared d
 
 Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
 
+For a diagnostic starting map, run `/brooks-audit` (dependency map + decay scores) and `/brooks-debt` (classified, prioritised debt). They tell you *where* the structural friction concentrates; treat their output as a feeder for candidate selection, not the final answer. This skill stays generative — it turns that diagnosis into **deepening opportunities**, which `/brooks-audit` does not propose.
+
 Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?

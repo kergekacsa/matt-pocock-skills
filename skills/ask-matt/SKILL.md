@@ -43,6 +43,17 @@ Not feature work — upkeep.
 
 - **`/improve-codebase-architecture`** — run whenever you have a spare moment to keep the codebase good for agents to operate in. It surfaces deepening opportunities; picking one _generates an idea_ you can take into the main flow at `/grill-with-docs`.
 
+The **Brooks-Lint** suite is the *diagnostic* counterpart — book-grounded decay analysis that scores and locates problems rather than proposing deepenings. Reach for the mode that matches the question:
+
+- **`/brooks-review`** — review a PR or diff before merge (Symptom → Source → Consequence → Remedy).
+- **`/brooks-audit`** — map module dependencies and architecture; also onboarding tours.
+- **`/brooks-debt`** — classify and prioritise tech debt into a refactoring roadmap.
+- **`/brooks-test`** — diagnose test-suite quality (brittleness, mock abuse, coverage illusion).
+- **`/brooks-health`** — composite 0–100 dashboard across all dimensions, e.g. before a release.
+- **`/brooks-sweep`** — run every check and auto-apply the safe fixes.
+
+Diagnose with Brooks, then feed the findings into `/improve-codebase-architecture` to turn them into deepening opportunities.
+
 ## Crossing sessions
 
 - **`/handoff`** — when a thread is full or you need to branch off (e.g. into a `/prototype` session), this compacts the conversation into a markdown file. You don't continue in place — you **open a new session and reference that file** to carry the context across. It's the bridge between context windows, in either direction. Use it when you want a **fresh session** but need the **current conversation preserved**.

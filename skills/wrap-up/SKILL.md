@@ -14,7 +14,8 @@ Every action in this skill falls into one of two classes. The line between them 
 **Non-mutating — run these yourself, automatically, no asking.** Anything that only *observes* and leaves the code, git history, and tracker untouched:
 - inspecting git/tracker/session state,
 - **running the test suite**,
-- **running `/da-review`** on this session's work.
+- **running `/da-review`** on this session's work,
+- **running `/brooks-review`** (and `/brooks-test` when tests changed) on this session's work.
 
 These are part of the audit. Run them as a matter of course — don't ask permission to verify. (Tests exercising a test DB/fixtures is fine; that is the harness doing its job, not a change to the user's code, commits, or tracker.)
 
@@ -49,23 +50,24 @@ Keep it tight. The user was there; this is a confirmation, not a retelling.
 
 ## Step 3 — Run verification, then audit the rest
 
-This step has two halves. **Run** the non-mutating verification yourself (items 1–2); **assess** the rest read-only (items 3–5). Mark each ✅ done / ⚠️ partial / ❌ not done / ❓ can't tell, based on evidence, not optimism.
+This step has two halves. **Run** the non-mutating verification yourself (items 1–3); **assess** the rest read-only (items 4–7). Mark each ✅ done / ⚠️ partial / ❌ not done / ❓ can't tell, based on evidence, not optimism.
 
 Run these now — no asking, **unless** they already ran successfully after the last meaningful change this session. If skipping, say so explicitly and state why (e.g. "Tests passed at 14:32 after the last code change — not re-running").
 
 1. **Tests** — Run the relevant test suite and record the result. If running is genuinely blocked (e.g. Docker/DB not up), say so and mark ❓ — don't fabricate a pass.
 2. **Devil's advocate** — Run `/devils-advocate` (or `/da-review`) on this session's work and capture its findings.
+3. **Brooks decay scan (advisory)** — Run `/brooks-review` on this session's work (and `/brooks-test` when tests or test files changed) and capture its findings. Treat these as **advisory** — report them in Step 4, but unlike tests and the devil's advocate they do **not** block wrap-up unless they surface a genuine defect.
 
 Assess these read-only:
 
-3. **Commit hygiene** — Is this session's work committed? Critically: does the commit (or a proposed commit) contain **only this session's changes** and not pre-existing uncommitted files? Is anything from this session still uncommitted?
-4. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
-5. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
-6. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
+4. **Commit hygiene** — Is this session's work committed? Critically: does the commit (or a proposed commit) contain **only this session's changes** and not pre-existing uncommitted files? Is anything from this session still uncommitted?
+5. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
+6. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
+7. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
 
-Adapt the **assessment** items (3–6) to the session: a planning/triage session has no commit item; a pure-refactor session may have no ticket. Drop an assessment item only when it genuinely cannot apply, and say why.
+Adapt the **assessment** items (4–7) to the session: a planning/triage session has no commit item; a pure-refactor session may have no ticket. Drop an assessment item only when it genuinely cannot apply, and say why.
 
-The two verifications (1 tests, 2 devil's advocate) are **never** droppable on these grounds. "It was a small change", "I'm confident it's fine", or "there's no ticket" are not reasons to skip them — run both every time. The only acceptable non-run is a hard block (e.g. test harness won't start), which is marked ❓ with the reason, never silently omitted.
+The two blocking verifications (1 tests, 2 devil's advocate) are **never** droppable on these grounds. "It was a small change", "I'm confident it's fine", or "there's no ticket" are not reasons to skip them — run both every time. The only acceptable non-run is a hard block (e.g. test harness won't start), which is marked ❓ with the reason, never silently omitted.
 
 ## Step 4 — Report
 

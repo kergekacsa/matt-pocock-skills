@@ -12,6 +12,8 @@ Use this for code snippets, repositories, technical designs, architecture, APIs,
 6. Propose concrete code or architecture improvements.
 7. Provide 3-4 improvement options when the solution direction is not obvious.
 
+For maintainability and design (step 5), `/brooks-review` is an optional evidence source: it returns book-grounded decay findings (Symptom → Source → Consequence → Remedy) you can cite alongside your own analysis. Use it to corroborate, not replace, the dimensions below.
+
 ## Severity levels
 
 - Blocker: likely wrong, unsafe, insecure, data-loss-prone, or prevents release.
