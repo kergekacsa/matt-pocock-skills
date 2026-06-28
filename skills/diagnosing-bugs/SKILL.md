@@ -9,6 +9,10 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+## Inline or delegated
+
+Right-size the effort. A shallow, self-contained bug (clear stack trace, single suspect function) — run the loop inline. A **hard** one (intermittent, spans modules, a performance regression, or a bug you have already failed to pin down) — delegate the loop to the `debugger` agent via the Agent tool (`subagent_type=debugger`, defined in `~/.claude/agents/debugger.md`). It works in an isolated context and can grind on the loop without cluttering this thread. The agent can't load this skill itself, so **brief it with the phases below** in the prompt, and require it to report back the tight loop, the ranked hypotheses, the confirmed cause, and the fix. Don't spin up a subagent for a one-liner.
+
 ## Phase 1 — Build a feedback loop
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
