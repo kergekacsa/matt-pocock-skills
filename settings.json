@@ -2,5 +2,18 @@
   "permissions": {
     "allow": [],
     "deny": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE '\\bgit\\b.*\\bcommit\\b'; then if curl -s --max-time 1 http://localhost:37778 >/dev/null 2>&1; then echo 'BLOCKED: Nimbalyst is available — use the developer_git_commit_proposal tool for commits, not git commit via Bash.'; exit 1; fi; fi"
+          }
+        ]
+      }
+    ]
   }
 }
