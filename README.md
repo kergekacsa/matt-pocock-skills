@@ -52,6 +52,8 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 ### `agents/`
 
+100+ specialized subagents covering engineering, infrastructure, data, security, and product roles. The bulk are imported from [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — browse `agents/` for the full list.
+
 - **[devils-advocate](./agents/devils-advocate.md)** — Subagent for deep adversarial review with live verification tools.
 
 ### `commands/`
@@ -63,6 +65,14 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 Shared reference files loaded by skills and referenced in `CLAUDE.md`:
 
 - **[formatting.md](./references/formatting.md)** — Visual formatting, Mermaid guidelines, and Markdown style rules for all output.
+
+## Sources
+
+This template draws on several upstream projects:
+
+- **[mattpocock/skills](https://github.com/mattpocock/skills)** — Base fork: the engineering and productivity skills.
+- **[VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents)** — Source of the 100+ specialized subagents in `agents/`.
+- **[user538295/claude_goodies](https://github.com/user538295/claude_goodies)** — Source of the devils-advocate agent and skill, the `/da-review` and review commands, and several workflow skills.
 
 ## Glossary
 
