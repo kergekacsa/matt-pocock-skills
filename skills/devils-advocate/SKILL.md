@@ -34,7 +34,7 @@ When genuinely in doubt, delegate — but never spin up a subagent to challenge 
 
 **Inline (small scope):** work the target yourself with the playbook's frameworks (pre-mortem, inversion, assumption hunt, hallucination check, contrarian alternative). Produce the report directly, then skip to step 4.
 
-**Delegated (larger / higher-stakes):** launch the `devils-advocate` agent via the Agent tool.
+**Delegated (larger / higher-stakes):** launch the `devils-advocate` agent via the Agent tool (defined in `~/.claude/agents/devils-advocate.md`).
 
 - **Focused target** (a function, a single decision): one `devils-advocate`.
 - **Broad target** (architecture, a full PRD, a large diff): launch several `devils-advocate` agents **in parallel**, each owning one lens:
@@ -102,7 +102,7 @@ Render **every concern as a bullet — never a code block.** Under Critical and 
 
 Assumptions, Blind Spots, and Hallucination Risk Flags are plain one-line bullets, one per item.
 
-For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `~/.claude/references/formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule above overrides it for concern items.
+For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `../../references/formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule above overrides it for concern items.
 
 ## Rules
 

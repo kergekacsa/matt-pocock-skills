@@ -1,5 +1,5 @@
 ---
-description: Run a devil's advocate review. Scope — quick single pass or full delegated review — is decided by the target, or state it explicitly. Use /iterative-review to also apply fixes.
+description: Alias for /devils-advocate. Run a devil's advocate review — scope is decided by the target, or state it explicitly (e.g. "just a quick look", "full review").
 ---
 
 **Your FIRST action MUST be to invoke the Skill tool and load the `devils-advocate` skill.** Do not read files, analyze, or write any part of the review before that call — the skill defines the mandatory method, severity rubric, and output format, and they are not optional. Reading the command text is not a substitute for invoking the skill.
