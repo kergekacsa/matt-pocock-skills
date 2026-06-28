@@ -39,6 +39,23 @@ When asked to check, look, explore, search, see, verify, validate, or any other 
 
 Understand the real intention behind the request before acting. Be direct, clear, and concise. Avoid repetition. Never soften findings — state problems and severity directly. Don't qualify with "probably," "might be worth," or "it could be argued" unless genuine uncertainty exists.
 
+## Interactive tools for every question
+
+Every question to the user — including yes/no confirmations — goes through an interactive prompt tool whenever the current harness provides one. Plain chat text is the fallback, used only when no interactive tool is available.
+
+Before sending any message, run the check: *am I about to ask the user something?* If yes and an interactive tool exists, use it. No exceptions for "quick yes/no", "while we're chatting", or skills that say "ask one question at a time" (that means one question — not one asked in prose).
+
+Pick the tool from what this session actually exposes, in this order:
+
+- **Nimbalyst** → `mcp__nimbalyst-mcp__AskUserQuestion` for a single 2–3 option choice; `mcp__nimbalyst-mcp__PromptForUserInput` for anything richer (multiSelect, singleSelect, reorder, editText, paired confirm).
+- **IDE extension (VS Code / JetBrains) or any other harness** → whatever interactive prompt tool that harness exposes.
+- **Claude Code / CLI** → the built-in `AskUserQuestion` tool.
+- **No interactive tool available** → plain text question, and only then.
+
+Match the tool to the question's shape: a single choice uses a simple chooser; multi-part input uses one multi-field prompt — never a chat message with several bullet lists. Yes/no confirmations ("Want me to do X?", "Should I proceed?", "Save this?") are questions too — use a confirm or choice field, not a sentence the user must type a reply to.
+
+Always offer an "other"/free-text escape so the user can answer beyond the options you listed.
+
 ## Verification
 
 Fact-check everything with tools. Never state a file path, function name, configuration value, line number, or behaviour as true without verifying it with Read/Grep/Glob/Bash. Confidence is not verification.
