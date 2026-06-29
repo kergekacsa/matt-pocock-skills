@@ -101,10 +101,7 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 
 ### 5. Wrap up
 
-Once every behavior is implemented and all tests are green:
-
-- [ ] Run the full test suite once (single test files suffice during the loop)
-- [ ] Run `/da-review` on the finished work
+Once every behavior is implemented and all tests are green, run `/wrap-up` — it handles the full test suite, DA review, commit hygiene, documentation, and tracker status in one pass. Do not commit here; wrap-up owns that conversation.
 
 ## Checklist Per Cycle
 
