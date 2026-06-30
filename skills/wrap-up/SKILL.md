@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: "Close out a work session: summarize what was done and why, run the tests and devil's advocate, then audit commit hygiene, acceptance criteria, and tracker status. Never changes anything (fix, commit, tracker) without an explicit yes, and blocks wrap-up on a failing test or devil's-advocate finding. Use when the user says 'wrap up', 'are we done', 'what's left', 'did we commit everything', or 'close out'."
+description: "Close out a work session: summarize what was done, run tests and devil's advocate, audit docs and tracker, then propose a commit via a traffic-light gate (🟢 all clean → propose immediately; 🟡 optional items remain → ask first; 🔴 blockers → fix first). Never changes anything without an explicit yes. Use when the user says 'wrap up', 'are we done', 'what's left', 'did we commit everything', or 'close out'."
 ---
 
 # Wrap-Up
@@ -50,7 +50,7 @@ Keep it tight. The user was there; this is a confirmation, not a retelling.
 
 ## Step 3 — Run verification, then audit the rest
 
-This step has two halves. **Run** the non-mutating verification yourself (items 1–3); **assess** the rest read-only (items 4–7). Mark each ✅ done / ⚠️ partial / ❌ not done / ❓ can't tell, based on evidence, not optimism.
+This step has two halves. **Run** the non-mutating verification yourself (items 1–3); **assess** the rest read-only (items 4–6). Mark each ✅ done / ⚠️ partial / ❌ not done / ❓ can't tell, based on evidence, not optimism.
 
 Run these now — no asking, **unless** they already ran successfully after the last meaningful change this session. If skipping, say so explicitly and state why (e.g. "Tests passed at 14:32 after the last code change — not re-running").
 
@@ -60,18 +60,17 @@ Run these now — no asking, **unless** they already ran successfully after the 
 
 Assess these read-only:
 
-4. **Commit hygiene** — Is this session's work committed? Critically: does the commit (or a proposed commit) contain **only this session's changes** and not pre-existing uncommitted files? Is anything from this session still uncommitted?
-5. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
-6. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
-7. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
+4. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
+5. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
+6. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
 
-Adapt the **assessment** items (4–7) to the session: a planning/triage session has no commit item; a pure-refactor session may have no ticket. Drop an assessment item only when it genuinely cannot apply, and say why.
+Adapt the **assessment** items (4–6) to the session: a planning/triage session may have no ticket; a pure-refactor session may have no docs to update. Drop an assessment item only when it genuinely cannot apply, and say why.
 
 The two blocking verifications (1 tests, 2 devil's advocate) are **never** droppable on these grounds. "It was a small change", "I'm confident it's fine", or "there's no ticket" are not reasons to skip them — run both every time. The only acceptable non-run is a hard block (e.g. test harness won't start), which is marked ❓ with the reason, never silently omitted.
 
 ## Step 4 — Report
 
-Show the summary (Step 2) and the checklist (Step 3) together, including what the tests and devil's advocate you just ran turned up. Lead with the headline: **done and clean**, **defects found — must fix first**, or **clean, but N close-out steps left**. Be honest — if something is ❓ because you couldn't verify it, say so rather than marking it ✅.
+Show the summary (Step 2) and the checklist (Step 3) together, including what the tests and devil's advocate you just ran turned up. Lead with the traffic-light headline: **🟢 green — done and clean**, **🔴 blockers found — must fix first**, or **🟡 yellow — clean but optional items remain**. Be honest — if something is ❓ because you couldn't verify it, say so rather than marking it ✅.
 
 ## Step 5 — Branch on what verification found
 
@@ -89,17 +88,21 @@ Fixing is a mutating action, so it happens only after the user says yes — then
 
 ### Case B — tests green and devil's advocate clean
 
-Now the only open items are the read-only-assessed ones (commit hygiene, acceptance criteria, tracker). If they're all ✅, say so and stop — done.
+If any non-commit mutating close-out steps remain (e.g. tracker update, doc fix), offer them now via an interactive prompt. Act only after an explicit yes; don't nudge twice for steps the user skips.
 
-Otherwise present the remaining **mutating** close-out steps and ask which, if any, to do — via an interactive prompt (in Nimbalyst, `PromptForUserInput` with a multi-select; otherwise list and ask). It's an offer, never a plan you've started:
+Then proceed to **Step 6** for the commit.
 
-> Verification's clean. These close-out steps are still open — want me to do any? [ ] commit this session's work only · [ ] update the tracker to in-review · …
+## Step 6 — Commit
 
-Then:
+Assess the traffic-light status from all Step 3 results, check commit hygiene, and act.
 
-- For each step the user picks, hand off to the proper flow — **after** the yes, never before. A commit stages **this session's changed lines only**; explicitly exclude files that were already dirty at session start and name the ones you excluded.
-- For steps the user doesn't pick, leave them as they are. Don't nudge twice.
-- If the user picks nothing / cancels, that's a valid answer. Stop cleanly.
+**Commit hygiene.** The staged set must contain **only this session's changes** — explicitly name and exclude any files that were already dirty at session start.
+
+**🟢 Green — all checks found nothing.** Every Step 3 item is ✅ (tests pass, DA clean, Brooks clean, docs current, ACs fully met, tracker current). Propose a commit immediately without asking.
+
+**🟡 Yellow — blockers clear, but optional items remain.** Tests and DA are ✅, but one or more items are ⚠️ (e.g. Brooks advisory findings, docs improvements suggested, tracker not updated, ACs partially covered). List the yellow items and ask — via interactive prompt — whether to address them first or commit now. Either answer is valid; don't nudge twice.
+
+**🔴 Red — Step 5 Case A applies; Step 6 never runs.**
 
 ## Notes
 
