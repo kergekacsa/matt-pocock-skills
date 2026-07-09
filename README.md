@@ -85,7 +85,7 @@ Shared reference files loaded by skills and referenced in `CLAUDE.md`:
 
 This template draws on several upstream projects:
 
-- **[mattpocock/skills](https://github.com/mattpocock/skills)** — Base fork: the engineering and productivity skills.
+- **[mattpocock/skills](https://github.com/mattpocock/skills)** — Base fork: the engineering and productivity skills. (updated 2026-07-10)
 - **[VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents)** — Source of the 100+ specialized subagents in `agents/`. (updated 2026-06-23)
 - **[user538295/claude_goodies](https://github.com/user538295/claude_goodies)** — Source of the devils-advocate agent and skill, the `/da-review` and review commands, and several workflow skills. (updated 2026-07-09)
 - **[wrsmith108/claude-md-optimizer](https://github.com/wrsmith108/claude-md-optimizer)** — Source of the `claude-md-optimizer` skill in `skills/`. (updated 2026-06-23)
