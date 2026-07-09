@@ -49,6 +49,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 - **[documentation-standard](./skills/documentation-standard/SKILL.md)** — Standards and workflows for creating and maintaining project documentation.
 - **[wrap-up](./skills/wrap-up/SKILL.md)** — Close out a work session: summarise, verify, audit commit hygiene.
 - **[claude-md-optimizer](./skills/claude-md-optimizer/SKILL.md)** — Slim oversized agent-instruction files (CLAUDE.md / AGENTS.md / copilot-instructions.md) via progressive disclosure, with zero information loss.
+- **[md-reviewer](./skills/md-reviewer/SKILL.md)** — Semantic/logic consistency reviewer for Markdown docs — contradictions, cross-references, master-follower validation, resumable for 50+ file sets.
 
 **Codebase health (Brooks-Lint)**
 
@@ -85,7 +86,7 @@ This template draws on several upstream projects:
 
 - **[mattpocock/skills](https://github.com/mattpocock/skills)** — Base fork: the engineering and productivity skills.
 - **[VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents)** — Source of the 100+ specialized subagents in `agents/`. (updated 2026-06-23)
-- **[user538295/claude_goodies](https://github.com/user538295/claude_goodies)** — Source of the devils-advocate agent and skill, the `/da-review` and review commands, and several workflow skills.
+- **[user538295/claude_goodies](https://github.com/user538295/claude_goodies)** — Source of the devils-advocate agent and skill, the `/da-review` and review commands, and several workflow skills. (updated 2026-07-09)
 - **[wrsmith108/claude-md-optimizer](https://github.com/wrsmith108/claude-md-optimizer)** — Source of the `claude-md-optimizer` skill in `skills/`. (updated 2026-06-23)
 - **[hyhmrright/brooks-lint](https://github.com/hyhmrright/brooks-lint)** (MIT) — Source of the `brooks-*` codebase-health skills, their shared framework in `skills/_shared/`, and the `/brooks-*` commands. (updated 2026-07-09)
 
