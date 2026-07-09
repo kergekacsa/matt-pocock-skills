@@ -41,6 +41,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 - **[teach](./skills/teach/SKILL.md)** — Teach a new skill or concept over multiple sessions.
 - **[writing-great-skills](./skills/writing-great-skills/SKILL.md)** — Reference for writing and editing skills well.
 - **[grilling](./skills/grilling/SKILL.md)** — Reusable interview loop behind `grill-me` and `grill-with-docs`.
+- **[research](./skills/research/SKILL.md)** — Delegate reading legwork to a background agent that investigates a question against primary sources and writes the findings to a Markdown file.
 
 **Custom**
 
