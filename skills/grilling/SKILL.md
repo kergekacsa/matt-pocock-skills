@@ -3,13 +3,17 @@ name: grilling
 description: Grill the user relentlessly about a feature, plan, or technical design until reaching shared understanding. Use before building, when the user wants to stress-test a design, or mentions "grill me".
 ---
 
-Grill me about this feature until we reach shared understanding. Walk each branch of the decision tree, resolving dependencies between decisions, and ask one question at a time — waiting for my answer before moving on. Asking multiple questions at once is bewildering. Scale the grilling to the stakes: relentless on a one-way door (hard to reverse), a light touch on a two-way door (small and easily undone).
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+
+If a *fact* can be found by exploring the codebase, look it up rather than asking me. The *decisions*, though, are mine — put each one to me and wait for my answer. Verify any claim about the code against the actual code before treating it as settled, and flag anything you're assuming rather than confirming.
+
+Do not enact the plan until I confirm we have reached a shared understanding.
+
+Scale the grilling to the stakes: relentless on a one-way door (hard to reverse), a light touch on a two-way door (small and easily undone).
 
 Grill the product logic as seriously as the technical design: every build should earn its place by serving a real user need or retiring a real risk, not just adding capability.
-
-For each question, give your recommended answer and your reasoning.
-
-If a question can be answered by exploring the codebase rather than asking me, explore first. Verify any claim about the code against the actual code before treating it as settled, and flag anything you're assuming rather than confirming.
 
 If what I've described is really several independent features, say so and help me separate them before grilling the first one.
 
