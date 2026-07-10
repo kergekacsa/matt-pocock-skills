@@ -31,7 +31,7 @@ from `../_shared/common.md` to determine the review scope before proceeding.
 
 1. Show pre-flight consent notice and wait for the user's one-time approval (Step 0 of the guide)
 2. Enumerate scope and initialize the `unresolvable` / `non_critical_rounds` / `fix_log` state (Step 1 of the guide)
-3. Run the four dimensions in sequence — review, test, debt, audit — each scanning, classifying, applying Safe + Extended-Safe fixes, and verifying via the project test command (Steps 2–5 of the guide)
+3. Run the four dimensions in sequence — review, test, debt, audit — each delegated to its own `general-purpose` subagent (`model: opus`) that scans, classifies, applies Safe + Extended-Safe fixes, and verifies via the project test command (Steps 2–5 of the guide); merge each subagent's `fix_log` rows and any new `unresolvable` entries into the pipeline state before starting the next dimension
 4. Iterate: re-scan modified files + same-module + static consumers; converge on a clean round, retire 3-retry failures to the `unresolvable` set, cap non-critical rounds at 3 (Step 6 of the guide)
 5. Aggregate residual and unresolvable items and output the Full Sweep Report (Steps 7–8 of the guide)
 

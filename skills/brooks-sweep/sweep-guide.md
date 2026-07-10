@@ -81,6 +81,13 @@ once so later steps never have to ask.
 
 ### Step 2 — brooks-review pass (R1–R6 code decay)
 
+**Delegate this pass** to one `general-purpose` subagent with `model: opus`. It starts
+with a fresh context, so give it: the scope, `../_shared/decay-risks.md`'s R-series
+definitions, the applied `.brooks-lint.yaml` config values, and the current
+`unresolvable` set (so it skips retired findings). It has Edit/Write/Bash access to
+apply fixes and run the test command itself. It returns its new `fix_log` rows and any
+newly `unresolvable` entries — merge both into pipeline state before Step 3.
+
 Scan every file in scope against all R-series risks defined in
 `../_shared/decay-risks.md`.
 
@@ -120,6 +127,10 @@ Scan every file in scope against all R-series risks defined in
 
 ### Step 3 — brooks-test pass (T1–T6 test decay)
 
+**Delegate this pass** to its own `general-purpose` subagent (`model: opus`), per the
+Step 2 delegation note — swap in `../_shared/test-decay-risks.md`'s T-series
+definitions.
+
 Scan test files (and untested production code) against T-series risks defined
 in `../_shared/test-decay-risks.md`.
 
@@ -131,6 +142,9 @@ record as T5 (Coverage Illusion). A test scaffold that adds a pure-function test
 ---
 
 ### Step 4 — brooks-debt pass (tech debt accumulation)
+
+**Delegate this pass** to its own `general-purpose` subagent (`model: opus`), per the
+Step 2 delegation note.
 
 Re-classify R-findings through a debt lens — same symptoms at accumulation scale:
 repeated duplication, layered workarounds, stale `TODO`/`FIXME` clusters, dead
@@ -144,6 +158,9 @@ and are more likely to land in Extended-Safe or Residual than Safe.
 ---
 
 ### Step 5 — brooks-audit pass (architecture integrity)
+
+**Delegate this pass** to its own `general-purpose` subagent (`model: opus`), per the
+Step 2 delegation note.
 
 Scan the full scope for architecture-level issues. The dependency-direction
 symptoms (inverted dependencies, circular imports, cross-domain coupling) are
@@ -176,7 +193,9 @@ cap, or no progress.
    to files that import from or are imported by a modified file (direct
    dependency graph only).
 
-6b. Re-run Steps 2–5 on the re-scan scope. For each new finding in this round:
+6b. Re-run Steps 2–5 on the re-scan scope — each a fresh subagent call per the Step 2
+   delegation note, seeded with the current `unresolvable` set and `fix_log`. For each
+   new finding in this round:
    - If it matches an entry in `unresolvable` → skip.
    - Else if 🔴 Critical → queue and fix; Critical findings iterate until
      resolved OR retired (3 failed attempts → `unresolvable`).
