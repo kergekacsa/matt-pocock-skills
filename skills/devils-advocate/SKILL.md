@@ -51,7 +51,7 @@ Give each subagent: the target (files, plan text, the decision), the context you
 An inline review has nothing to synthesize — go straight to the verdict. When you delegated, collect every subagent's findings, then:
 
 - **Dedupe** — collapse the same concern raised by multiple lenses into one.
-- **Rank** by severity; surface the **top 7** that matter most.
+- **Rank** by severity/impact; surface the **top 10** that matter most, pooled across all categories (see `references/output-format.md` for the fill order).
 - **"so what?" test** — drop anything whose consequence is "nothing much."
 - **Reconcile** — if subagents disagree, say so and take a position.
 - **Refute-pass (high-stakes only)** — for surviving Critical/Major findings on a production-grade target, dispatch one more `devils-advocate` to try to *refute* each; keep only what survives. Skip for prototypes and cheap reviews.
@@ -77,37 +77,15 @@ Severity is honest, never inflated. Mark each concern **blocking** or **non-bloc
 
 ## Output format (mandatory — use this exact structure)
 
-Present the synthesized result in the structured report below. **End with the global Verdict** so it lands at the bottom — the first thing visible in a scrolled terminal.
+The full report structure — headings, numbering, the global cap and fill order, item formats, and the Recommended Actions table — is defined in [references/output-format.md](references/output-format.md). Follow it exactly; do not substitute your own structure, drop sections, or invent your own numbering. It applies whether you produced the report inline (step 2) or by synthesizing delegated subagent findings (step 3). **End with the global Verdict** so it lands at the bottom — the first thing visible in a scrolled terminal.
 
-### ✅ What Holds Up (steel-man first)
-### 🔴 Critical Issues (Must Address)
-### 🟠 Major Concerns (Should Address)
-### 🟡 Assumptions Under Challenge
-### 🔵 Blind Spots & Missing Considerations
-### ⚪ Hallucination Risk Flags
-### 🔄 Strongest Counterargument
-### 📋 Recommended Actions — as a table: `| # | Action | Blocking? |`
-### ➕ Held back — one line *only if* findings were truncated to the top 7: `+N lower-severity findings not shown — ask to see them`. Omit if nothing was dropped.
-### 🏁 Verdict (last line) — Ship it / Ship with changes / Rethink it
-
-Omit any of Critical, Major, Assumptions, Blind Spots, Hallucination Risk Flags, or Strongest Counterargument that genuinely has nothing — don't pad with "none found". Always keep ✅ What Holds Up, 📋 Recommended Actions, and the 🏁 Verdict (always the final line).
-
-Render **every concern as a bullet — never a code block.** Under Critical and Major, expand each with sub-bullets, attributed to the lens that found it:
-
-- **[concern in one line]** — Severity · Blocking / Non-blocking
-  - **Surfaced by:** [lens / framework]
-  - **What I see:** [specific — cite files, lines, claims]
-  - **Why it matters:** [the consequence if it ships as-is]
-  - **Fix:** [specific, actionable]
-
-Assumptions, Blind Spots, and Hallucination Risk Flags are plain one-line bullets, one per item.
-
-For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `../../references/formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule above overrides it for concern items.
+For everything else — comparing alternatives, drawing a failure cascade, a pipeline, a definition table — follow `../../references/formatting.md`: pick the format that fits (table, Mermaid, etc.) and use icons as anchors. Never force a visual where plain text is cleaner. The concern-bullet rule in `references/output-format.md` overrides it for concern items.
 
 ## Rules
 
 - **Right-size the machinery.** Challenge small, self-contained targets inline; delegate larger or higher-stakes ones to `devils-advocate` subagent(s). Don't spin up a subagent for a one-liner.
-- **Top 7 only** in the synthesis. Rank by severity; if the subagents found more, surface the 7 that matter most **and add the `➕ Held back` line with the exact count of what was omitted** — never drop findings silently.
+- **Cap at 10, globally.** See `references/output-format.md` for the exact cap, fill order, and numbering rules — never drop findings silently past that; use the `➕ Held back` line instead.
+- **Per-lens output stays internal.** When you dispatch parallel `devils-advocate` lens-agents, their raw bullets feed your synthesis — never paste or forward them directly to the user. Only the final synthesized report is shown.
 - **Every concern actionable.** If there's no "what to do," drop it.
 - **The "so what?" test.** If ignoring it changes nothing, drop it.
 - **Honest, not nihilistic.** When something is genuinely good, say so. "Ship it" is a valid verdict.
