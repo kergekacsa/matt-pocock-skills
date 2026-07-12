@@ -42,6 +42,7 @@ Reach for a diagram when it earns its place — e.g. a failure cascade, a depend
 
 ### Headings
 
+- Always use proper Markdown header syntax (`#` through `######`) — never fake a heading with bold text, all-caps text, or plain text on its own line.
 - ATX style only (`#` not underlines).
 - Increment by one level at a time — never skip.
 - Sentence case ("Authentication flow" not "Authentication Flow").
