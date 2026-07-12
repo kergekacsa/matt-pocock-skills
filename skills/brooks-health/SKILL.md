@@ -1,19 +1,8 @@
 ---
 name: brooks-health
-description: >
-  Combined codebase health dashboard that scores a project across all four quality
-  dimensions — PR quality, architecture, tech debt, and test quality — in a single
-  pass, drawing on twelve classic engineering books.
-  Triggers when: user wants an overall quality assessment, asks "how healthy is this
-  codebase?", "run all the checks", "I need a health score before the release", or
-  wants to onboard a new team with a quality overview.
-  Do NOT trigger for: server health checks, HTTP health endpoints, Kubernetes
-  liveness/readiness probes, database health, or application uptime. Also do not
-  trigger when the user specifically requests only one dimension — use the
-  corresponding focused skill instead (brooks-review / brooks-audit /
-  brooks-debt / brooks-test).
+description: |
+  Combined codebase health dashboard that scores a project across all four quality dimensions — PR quality, architecture, tech debt, and test quality — in a single pass, drawing on twelve classic engineering books. Triggers when: user wants an overall quality assessment, asks "how healthy is this codebase?", "run all the checks", "I need a health score before the release", or wants to onboard a new team with a quality overview. Do NOT trigger for: server health checks, HTTP health endpoints, Kubernetes liveness/readiness probes, database health, or application uptime. Also do not trigger when the user specifically requests only one dimension — use the corresponding focused skill instead (brooks-review / brooks-audit / brooks-debt / brooks-test). Also do not trigger when the user wants the full-depth pass, a mandatory adversarial challenge, or a design-doc/doc-drift audit rather than a quick composite score — use `/full-review`, which runs the deeper equivalent for a directory/module target.
 ---
-
 # Brooks-Lint — Health Dashboard
 
 ## Setup

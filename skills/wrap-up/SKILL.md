@@ -1,33 +1,19 @@
 ---
 name: wrap-up
-description: "Close out a work session: summarize what was done, run tests and devil's advocate, audit docs and tracker, then propose a commit via a traffic-light gate (🟢 all clean → propose immediately; 🟡 optional items remain → ask first; 🔴 blockers → fix first). Never changes anything without an explicit yes. Use when the user says 'wrap up', 'are we done', 'what's left', 'did we commit everything', or 'close out'."
+description: "Close out a work session: run the test suite — the only thing this skill runs itself — then report on everything else (full-review/code-review, documentation, acceptance criteria) as done, unfinished, or missing, without running any of it, plus a separate non-blocking tracker-status check at ticket close. Failing or incomplete tests, or any reported-missing review/docs/AC item, block the commit offer by default; the user can explicitly override a specific blocker to proceed anyway, this session only. Never changes anything without an explicit yes. Use when the user says 'wrap up', 'are we done', 'what's left', 'did we commit everything', or 'close out'."
 ---
 
 # Wrap-Up
 
-You are the person who, at the end of a work session, stops and asks "okay — what did we actually do, why did we do it, and did we finish it properly?" You produce a clear summary and an honest checklist, then hand control back to the user.
+You are the person who, at the end of a work session, stops and asks "okay — what did we actually do, why did we do it, and what's actually finished?" You run the one check that's genuinely this skill's job, report honestly on everything else, and hand control back to the user.
+
+## What this skill does NOT do
+
+This skill runs **only the test suite** itself. It never runs `/full-review`, `/code-review-matt`, `/da-review`, `/brooks-review`, or any other check on the user's behalf — those are the user's to invoke, on their own schedule. If one of them hasn't run this session, or ran but left findings unresolved, wrap-up reports that plainly as missing or unfinished. It does not chase it down, does not offer to run it for the user, and does not fix anything itself.
 
 ## Prime directive — verify freely, never mutate without a yes
 
-Every action in this skill falls into one of two classes. The line between them is the whole point of the skill.
-
-**Non-mutating — run these yourself, automatically, no asking.** Anything that only *observes* and leaves the code, git history, and tracker untouched:
-- inspecting git/tracker/session state,
-- **running the test suite**,
-- **running `/da-review`** on this session's work,
-- **running `/brooks-review`** (and `/brooks-test` when tests changed) on this session's work.
-
-These are part of the audit. Run them as a matter of course — don't ask permission to verify. (Tests exercising a test DB/fixtures is fine; that is the harness doing its job, not a change to the user's code, commits, or tracker.)
-
-**Mutating — never without an explicit yes to that specific action.** Anything that writes to disk, git, or the tracker:
-- editing or fixing code,
-- staging/committing,
-- updating the tracker,
-- any other write.
-
-For a mutating step you **report and ask**, and act only after the user says yes to that exact step — then hand off to the proper skill/tool rather than improvising. "Wrap up" is never an instruction to fix or commit things on its own.
-
-If you are unsure which class something is in, treat it as mutating — ask first.
+Verify freely: run the test suite, inspect git/tracker/session state, read what other checks already reported in this session's history (never re-run any of them), ask the user about a blocker — none of that is a mutation. Never mutate — edit or fix code, stage, commit, or touch the tracker (including closing the ticket) — without an explicit yes to that specific action. If you are unsure which class something is in, treat it as mutating — ask first.
 
 ## Step 1 — Gather the facts (read-only)
 
@@ -36,73 +22,73 @@ Collect, without changing anything:
 - **What changed this session.** The files this session edited (session-edited-files tooling if available, else `git status` + `git diff`), and which commits were made *during* this session vs. which changes are still uncommitted.
 - **What was pre-existing.** Compare against the working-tree state at session start. Files that were already modified/untracked before this session are **not** this session's work — call them out separately so they never get conflated with the session's diff.
 - **The intent / the "why".** Which issue, ticket (e.g. NIM-XX), bug report, or request drove this session. Pull the tracker item and its acceptance criteria if there is one. If there is no ticket, derive intent from the first user prompt(s).
-- **Where verification stands.** Note whether tests and a devil's-advocate pass were already run this session — but don't rely on it. You will run both yourself in Step 3 regardless, since they're non-mutating.
 
-## Step 2 — Write the summary
+## Step 2 — Run the tests
+
+The only check this skill performs itself. Identify the project's canonical way to run **all** of its tests — a root test script, CI config, or, for a monorepo, every workspace's suite, not just the one nearest this session's change — and run it. Record pass/fail. If only a subset actually ran (e.g. one workspace because the others couldn't be discovered or invoked), mark this ⚠️ unfinished, not ✅ — a partial run is not a pass, and the unrun portion is its own blocker in Step 5. Don't proceed past a failing or incomplete suite without flagging it as a blocker. If the project has no test suite and nothing invocable (e.g. a documentation-only repo), say so explicitly and mark this step not applicable — never fabricate a result for a suite that doesn't exist.
+
+## Step 3 — Check what else has (and hasn't) happened
+
+Read-only — for each item below, look at this session's conversation and tool-call history for evidence. **Do not run any of them yourself**, even if one is missing or looks quick to run.
+
+- **Full review / code review.** Did `/full-review` (or a narrower single-dimension skill run on its own — `/code-review-matt`, `/brooks-review`, `/da-review`) run this session, covering this session's current diff? If yes, note what it found and whether any finding is still unresolved. If no run covers the current diff, mark it **missing** — this session's changes have not been reviewed.
+- **Documentation.** Is there evidence in this session that docs describing changed behavior were checked or updated? If there's no such evidence, mark **not checked** — don't assume it's fine because the change looked small.
+- **Acceptance criteria.** If a review report from this session already states AC status, use it verbatim — don't re-derive it. Otherwise mark **not checked**. (In practice this only comes up when the user has already chosen to override the missing-review blocker below, since that's the same report this would otherwise come from.)
+
+Mark each item ✅ done / ⚠️ unfinished (it ran, but something's still open) / ❌ missing (never ran) / ❓ can't tell — based on evidence, never optimism.
+
+Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's checked separately in Step 8, since it bears on closing the ticket, not on whether the code itself is safe to commit.
+
+## Step 4 — Write the summary
 
 Present a short, factual summary in two parts:
 
 - **What was done** — the concrete changes, grouped logically (not a raw file list). Reference files as clickable links and commits by hash.
 - **What it was for** — the issue/intent it served, and whether the change actually satisfies that intent.
-- **Where it went sideways** — wrong turns, disproven assumptions, or corrections the user had to make this session. State them plainly; a misconception that survived into a commit or a doc is a defect. If one traces back to a missing or misleading doc, carry it into the Documentation check as a fix to propose.
+- **Where it went sideways** — wrong turns, disproven assumptions, or corrections the user had to make this session. State them plainly; a misconception that survived into a commit or a doc is a defect.
 
 Keep it tight. The user was there; this is a confirmation, not a retelling.
 
-## Step 3 — Run verification, then audit the rest
+## Step 5 — Report
 
-This step has two halves. **Run** the non-mutating verification yourself (items 1–3); **assess** the rest read-only (items 4–6). Mark each ✅ done / ⚠️ partial / ❌ not done / ❓ can't tell, based on evidence, not optimism.
+Show the summary (Step 4) together with the Step 2 (tests) and Step 3 (everything else) status. Be honest — if something can't be verified, mark it ❓ rather than assuming ✅.
 
-Run these now — no asking, **unless** they already ran successfully after the last meaningful change this session. If skipping, say so explicitly and state why (e.g. "Tests passed at 14:32 after the last code change — not re-running").
+**Everything blocks by default.** A failing or incomplete test suite, or any Step 3 item marked ⚠️/❌/❓, is a blocker on the commit offer (Step 7) — full stop, no exceptions baked in. List every current blocker plainly in the report.
 
-1. **Tests** — Run the relevant test suite and record the result. If running is genuinely blocked (e.g. Docker/DB not up), say so and mark ❓ — don't fabricate a pass.
-2. **Devil's advocate** — Run the `/da-review` skill (not the `devils-advocate` agent — the skill keeps the output visible and in context). Provide it with the issue/task and acceptance criteria gathered in Step 1 **and** all session changes, so it can assess correctness against intent, not just internal code quality. Capture its findings.
-3. **Brooks decay scan (advisory)** — Run `/brooks-review` on this session's work (and `/brooks-test` when tests or test files changed) and capture its findings. Treat these as **advisory** — report them in Step 4, but unlike tests and the devil's advocate they do **not** block wrap-up unless they surface a genuine defect.
+## Step 6 — Override or proceed
 
-Assess these read-only:
+If there are no blockers, go straight to **Step 7 (Commit)**.
 
-4. **Documentation** — Do all docs that describe changed behaviour reflect the new reality? Check README, CLAUDE.md and the files it references (e.g. `references/`), inline comments, API docs, and any HTML pages. Outdated documentation is a bug. Likewise, if a misconception you hit this session traces to a doc gap, propose the fix here.
-5. **Done vs. acceptance criteria** — Walk the ticket's acceptance criteria one by one. Is each genuinely met, or just plausibly met? Flag any AC that's unaddressed or only partially covered.
-6. **Tracker** — Is the issue's status current (e.g. flipped to in-review/done when its ACs are met)? A finished-but-still-to-do ticket is a gap.
+If there are blockers, walk them one at a time via an interactive prompt — never assume a blanket "proceed anyway":
 
-Adapt the **assessment** items (4–6) to the session: a planning/triage session may have no ticket; a pure-refactor session may have no docs to update. Drop an assessment item only when it genuinely cannot apply, and say why.
+> These are blocking the commit right now:
+> 1. Tests failing — [summary]
+> 2. Full-review hasn't run for this diff
+> 3. …
+> For each: fix it now, or override it (I'll state what proceeding without it means first)?
 
-The two blocking verifications (1 tests, 2 devil's advocate) are **never** droppable on these grounds. "It was a small change", "I'm confident it's fine", or "there's no ticket" are not reasons to skip them — run both every time. The only acceptable non-run is a hard block (e.g. test harness won't start), which is marked ❓ with the reason, never silently omitted.
+- **Fix it now** — what this means depends on where the blocker came from. A **Step 2 (tests)** blocker is wrap-up's own to hand off: a failing test routes to the right flow (`/tdd`, a direct fix); a partial run (some suite couldn't be discovered or invoked) routes to making that suite invocable — either way, **re-run Step 2** afterward regardless of how small the fix looks, since a fix to one thing can silently break another. A **Step 3** blocker (missing review, undocumented change) is never wrap-up's to fix or run, full stop: say so, then pause here — the user leaves wrap-up, does the thing themselves (runs `/full-review`, updates the doc), and re-invokes wrap-up to re-check. Wrap-up performs or orchestrates neither kind of fix itself. Any new blocker either path surfaces re-enters this same walk.
+- **Override** — state the concrete consequence of proceeding without it (a failing test staying broken, a suite of unknown status going uncommitted-against, an unreviewed diff going in uninspected, an unchecked AC) and get the user's explicit yes to that specific override before it stops blocking. An override applies to this wrap-up only, not as a standing exception for next time — but it does survive this run's own Step 2 re-runs: a re-run triggered by a different fix doesn't re-litigate an override already granted earlier in this same run. Only genuinely new blockers re-enter this walk.
 
-## Step 4 — Report
+Nothing proceeds to Step 7 until every blocker is either fixed or explicitly overridden.
 
-Show the summary (Step 2) and the checklist (Step 3) together, including what the tests and devil's advocate you just ran turned up. Lead with the traffic-light headline: **🟢 green — done and clean**, **🔴 blockers found — must fix first**, or **🟡 yellow — clean but optional items remain**. Be honest — if something is ❓ because you couldn't verify it, say so rather than marking it ✅.
+## Step 7 — Commit
 
-## Step 5 — Branch on what verification found
-
-The question you ask depends entirely on whether verification came back clean.
-
-### Case A — tests failed, or devil's advocate found something that needs to change
-
-These are **blockers**, not close-out chores. The issue is not finished, so do **not** offer to commit, update the tracker, or otherwise "wrap up the issue" — that would be wrapping up around a known defect. Instead, present the failing tests / DA findings and ask the one question that fits: **do you want me to fix these now?**
-
-> Devil's advocate / the tests surfaced these, and they need fixing before this can be wrapped up:
-> 1. … 2. …
-> Want me to fix them? [ ] fix all · [ ] fix #1 only · [ ] not now
-
-Fixing is a mutating action, so it happens only after the user says yes — then hand off to the right flow (`/tdd`, `/da-review`'s fix pass, a direct fix). After fixes land, verification re-runs and the wrap-up continues. Until then, the commit/tracker steps stay off the table.
-
-### Case B — tests green and devil's advocate clean
-
-If any non-commit mutating close-out steps remain (e.g. tracker update, doc fix), offer them now via an interactive prompt. Act only after an explicit yes; don't nudge twice for steps the user skips.
-
-Then proceed to **Step 6** for the commit.
-
-## Step 6 — Commit
-
-Assess the traffic-light status from all Step 3 results, check commit hygiene, and act.
+Reachable once there are no blockers left, whether because everything was clean or every blocker was explicitly overridden in Step 6.
 
 **Commit hygiene.** The staged set must contain **only this session's changes** — explicitly name and exclude any files that were already dirty at session start.
 
-**🟢 Green — all checks found nothing.** Every Step 3 item is ✅ (tests pass, DA clean, Brooks clean, docs current, ACs fully met, tracker current). Propose a commit immediately without asking.
+If anything was overridden rather than fixed, name it plainly in the interactive prompt so the override is visible at the moment of commit, not buried earlier in the transcript.
 
-**🟡 Yellow — blockers clear, but optional items remain.** Tests and DA are ✅, but one or more items are ⚠️ (e.g. Brooks advisory findings, docs improvements suggested, tracker not updated, ACs partially covered). List the yellow items and ask — via interactive prompt — whether to address them first or commit now. Either answer is valid; don't nudge twice.
+Propose the commit via an interactive prompt. Act only after an explicit yes.
 
-**🔴 Red — Step 5 Case A applies; Step 6 never runs.**
+## Step 8 — Close the ticket
+
+Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** (read from an existing report, not derived here). If AC status is `not checked` or reports anything unmet, don't offer this — say plainly what's unresolved instead. If there's no ticket at all, this step doesn't apply — skip it, there's nothing to close.
+
+Before proposing the flip, check whether anything else about the ticket is stale (labels, links, a status that should already reflect this work) — this is wrap-up's own read-only check, not read from any report — and name it alongside the proposal so it isn't closed over silently.
+
+Propose flipping the ticket's status (e.g. to done/closed) via an interactive prompt. Act only after an explicit yes.
 
 ## Notes
 

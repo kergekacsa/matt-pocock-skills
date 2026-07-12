@@ -11,7 +11,10 @@ description: >
   take forever", "tests pass but bugs still reach production", or "we have too many mocks".
   Do NOT trigger for: writing new tests from scratch (use the regular test-writing
   workflow) or testing framework/syntax questions — this skill reviews an existing
-  suite for structural quality problems, not individual test authoring.
+  suite for structural quality problems, not individual test authoring. Also not for a
+  full multi-dimension pre-merge review spanning correctness, spec, docs, tests, and
+  architecture together — use `/full-review`, which delegates its test-quality axis to
+  this skill.
 ---
 
 # Brooks-Lint — Test Quality Review

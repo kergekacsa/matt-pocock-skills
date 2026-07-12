@@ -47,8 +47,9 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 - **[aaa](./skills/aaa/SKILL.md)** — Evaluate and improve ideas, features, architecture, and code against world-class standards.
 - **[devils-advocate](./skills/devils-advocate/SKILL.md)** — Adversarial review of any plan, design, architecture, or code change.
+- **[full-review](./skills/full-review/SKILL.md)** — The heavyweight, full-depth review: any code scope — a PR, commit range, uncommitted diff, directory, or module — checked for correctness (runs the real test suite), spec/design-doc compliance, documentation drift, code quality, test quality, and architecture, plus a mandatory adversarial challenge. Read-only; delegates every check to the skill that owns it, run at full depth (not `brooks-health`'s capped/abbreviated scan). Never mutates. It's a **router**, not a replacement: this removes the duplicated review *logic* that used to live inside `wrap-up`, but `brooks-health`, `brooks-*`, and `code-review-matt` all stay independently invocable for a narrower, single-dimension check — reach for `full-review` when you want every dimension gated at once, and one of the others when you only want its angle.
 - **[documentation-standard](./skills/documentation-standard/SKILL.md)** — Standards and workflows for creating and maintaining project documentation.
-- **[wrap-up](./skills/wrap-up/SKILL.md)** — Close out a work session: summarise, verify, audit commit hygiene.
+- **[wrap-up](./skills/wrap-up/SKILL.md)** — Close out a work session: runs only the test suite itself, then reports whether `full-review`/`code-review-matt`/docs/acceptance criteria ran or are still missing — never running any of them. Everything missing blocks the commit offer by default, overridable per-item, this session only. Summarises, proposes a commit, then closes the ticket.
 - **[claude-md-optimizer](./skills/claude-md-optimizer/SKILL.md)** — Slim oversized agent-instruction files (CLAUDE.md / AGENTS.md / copilot-instructions.md) via progressive disclosure, with zero information loss.
 - **[md-reviewer](./skills/md-reviewer/SKILL.md)** — Semantic/logic consistency reviewer for Markdown docs — contradictions, cross-references, master-follower validation, resumable for 50+ file sets.
 
@@ -56,11 +57,11 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 Book-grounded code-review skills that diagnose decay against twelve classic engineering books. They share a single framework in [`skills/_shared/`](./skills/_shared/) (decay-risk definitions, source coverage, remedy guide), so each skill stays thin.
 
-- **[brooks-review](./skills/brooks-review/SKILL.md)** — PR/diff review: Symptom → Source → Consequence → Remedy. Invoked by `wrap-up` and available to `aaa`.
+- **[brooks-review](./skills/brooks-review/SKILL.md)** — PR/diff review: Symptom → Source → Consequence → Remedy. Invoked by `full-review` and available to `aaa`.
 - **[brooks-audit](./skills/brooks-audit/SKILL.md)** — Map module dependencies and architecture; also onboarding tours. Feeds `improve-codebase-architecture`.
-- **[brooks-debt](./skills/brooks-debt/SKILL.md)** — Classify and prioritise tech debt into a refactoring roadmap.
+- **[brooks-debt](./skills/brooks-debt/SKILL.md)** — Classify and prioritise tech debt into a refactoring roadmap. Also `full-review`'s code-quality delegate for whole-directory/module (no-diff) targets.
 - **[brooks-test](./skills/brooks-test/SKILL.md)** — Diagnose test-suite quality (brittleness, mock abuse, coverage illusion). Invoked at the `tdd` refactor step.
-- **[brooks-health](./skills/brooks-health/SKILL.md)** — Composite 0–100 dashboard across all dimensions.
+- **[brooks-health](./skills/brooks-health/SKILL.md)** — Lightweight composite 0–100 dashboard across all four Brooks dimensions, using abbreviated/capped scans for a fast score — no test execution, no doc-drift check, no adversarial challenge. Use `full-review` instead when the full-depth pass is wanted, not just a number.
 - **[brooks-sweep](./skills/brooks-sweep/SKILL.md)** — Run every check and auto-apply the safe fixes.
 
 ### `agents/`

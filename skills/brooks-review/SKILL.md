@@ -11,7 +11,10 @@ description: >
   DDD / SOLID principles / Hyrum's Law / deep modules / tactical programming /
   conceptual integrity / Brooks's Law / Mythical Man-Month / second system effect.
   Do NOT trigger for: questions about how to write code from scratch, language syntax
-  questions, or framework/tool questions where no existing code is shared.
+  questions, or framework/tool questions where no existing code is shared. Also do not
+  trigger when a full multi-dimension pre-merge review is wanted (correctness, spec,
+  docs, tests, and architecture together) — use `/full-review`, which delegates its
+  code-quality axis to this skill.
 ---
 
 # Brooks-Lint — PR Review
@@ -28,7 +31,7 @@ description: >
 **If the user has not specified files or pasted code:** apply Auto Scope Detection
 from `../_shared/common.md` to determine the review scope before proceeding.
 
-1. Understand the review scope, then scan for each decay risk in the order specified (Steps 1–6 of the guide)
+1. Understand the review scope, then scan for each decay risk in the order specified (Steps 2–6b of the guide)
 2. Run the Quick Test Check (Step 7 of the guide) — skip for docs-only or non-production changes
 3. Apply the Iron Law to every finding
 4. Output using the Report Template from common.md

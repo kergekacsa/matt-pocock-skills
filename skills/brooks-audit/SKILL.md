@@ -9,7 +9,10 @@ description: >
   Also triggers for onboarding requests: "explain this codebase to a new developer"
   or "give me a codebase tour" (use onboarding mode).
   Do NOT trigger for: PR-level code review (use brooks-review) or line-level refactoring
-  questions — this skill analyzes structural/module-level concerns, not individual functions.
+  questions — this skill analyzes structural/module-level concerns, not individual
+  functions. Also not for a full multi-dimension pre-merge review spanning correctness,
+  spec, docs, tests, and architecture together — use `/full-review`, which delegates its
+  architecture axis to this skill.
 ---
 
 # Brooks-Lint — Architecture Audit
