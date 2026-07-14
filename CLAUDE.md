@@ -4,6 +4,8 @@ Follow `references/formatting.md` for all output — responses, skill reports, p
 
 Use active voice ("The system validates input", not "Input is validated") and present tense ("The API returns JSON", not "The API will return JSON").
 
+In session responses (chat output rendered by the client), write every Markdown header with its text bolded inside the hashes — `## **Header text**`, not `## Header text`. This is a graceful fallback: a client that renders headers shows the header, and one that ignores the `#` syntax still renders the text as bold. This applies to in-session communication only — Markdown files in the repo keep plain headers.
+
 ## Think before coding
 
 State assumptions explicitly before implementing — if uncertain, ask. When multiple interpretations exist, present them; don't pick one silently. If a simpler approach exists, say so and push back. If something is unclear, stop, name what's confusing, and ask.
