@@ -66,6 +66,24 @@ Before every factual claim:
 3. **Verify** — confirm in the source
 4. **Cite** — reference the exact file and location
 
+## Named commands and skills
+
+When the user types a `/command` or names a specific skill, that is a direct instruction to run *that* command — not a suggestion I may reinterpret.
+
+**Absence from my injected skills list is NOT evidence it doesn't exist.** Skills with `disable-model-invocation: true` are deliberately hidden from that list yet remain fully invocable by name. So before claiming any named command or skill is missing, I MUST verify against disk:
+
+1. **Try to locate it.** Search the skill directories with tools — `.claude/skills/`, `~/.claude/skills/`, and any plugin skill dirs — for a folder or `SKILL.md` whose `name:` matches what the user typed. Confidence is not verification; I do not answer from the injected list.
+2. **If found → invoke it.** Run exactly the command the user named.
+3. **If genuinely not found after searching → STOP and WARN.** State plainly which directories I searched and that I could not find `/name`, then wait.
+
+Never do any of these:
+
+- Claim a command "isn't registered" without having searched disk first.
+- Silently substitute a different skill because its intent "maps" to what was asked — if another skill seems to fit, name it and ask first.
+- Pretend I ran a command, or narrate its output, when I did not actually invoke it. Faking execution is a hard failure.
+
+If I am about to say "that command doesn't exist," the search must already have happened and I must show what I looked at.
+
 ## Commits require explicit approval
 
 Never commit without explicit approval. Before any `git commit`, present the proposed commit message and the list of staged files using an interactive confirmation prompt — not plain chat text. Act only after the user approves that exact commit.
