@@ -4,22 +4,49 @@ The single source of truth for the devil's-advocate full report. Used by the `de
 
 ## Structure (fixed order)
 
-- ✅ **What Holds Up** (steel-man first) — your steel-man, lead with it. Be intellectually honest: acknowledge what is well-reasoned, correct, or appropriately caveated. Critique without nihilism. Prose or one-line bullets. **Not numbered** — this isn't a concern needing an action.
-- 🔴 **Critical Issues (Must Address)** — blocks correctness, security, or safety; blockers.
-- 🟠 **Major Concerns (Should Address)** — significant design flaw, missing requirement, or likely bug.
-- 🟡 **Assumptions Under Challenge** — explicit list of assumptions identified, each with your challenge to it.
-- 🔵 **Blind Spots & Missing Considerations** — what wasn't addressed that should have been.
-- ⚪ **Hallucination Risk Flags** — specific claims that stay unverifiable after you tried to check them.
-- 🔄 **Strongest Counterargument** — the most compelling case against the main conclusion. Prose, one paragraph. **Not numbered.**
-- 📋 **Recommended Actions** — every numbered item from the five categories above, mirrored row-for-row.
-- ➕ **Held back** — one line, only if the global cap trimmed anything.
-- 🏁 **Verdict** (last line) — Ship it / Ship with changes / Rethink it. Always the final line of the report.
+Render every section below as a real Markdown header, bold text inside the hashes so
+it degrades gracefully on clients that ignore `#` syntax — never a bullet with bold
+text standing in for a heading:
+
+```
+## **✅ What Holds Up**
+## **🔴 Critical Issues (Must Address)**
+## **🟠 Major Concerns (Should Address)**
+## **🟡 Assumptions Under Challenge**
+## **🔵 Blind Spots & Missing Considerations**
+## **⚪ Hallucination Risk Flags**
+## **🔄 Strongest Counterargument**
+## **📋 Recommended Actions**
+## **➕ Held back**
+## **🏁 Verdict**
+```
+
+The bold span wraps the icon and the words together — matching the global
+`## **Header text**` session-header convention exactly, not just the words after the
+icon.
+
+Order is fixed, top to bottom, exactly as shown. Each header is a section break in
+appearance only — it never resets the numbered sequence (see Numbering below); the
+first item under a header continues from whatever number the previous category left
+off at. What goes under each header:
+
+- **✅ What Holds Up** (steel-man first) — your steel-man, lead with it. Be intellectually honest: acknowledge what is well-reasoned, correct, or appropriately caveated. Critique without nihilism. Prose or one-line bullets. **Not numbered** — this isn't a concern needing an action.
+- **🔴 Critical Issues (Must Address)** — blocks correctness, security, or safety; blockers.
+- **🟠 Major Concerns (Should Address)** — significant design flaw, missing requirement, or likely bug.
+- **🟡 Assumptions Under Challenge** — explicit list of assumptions identified, each with your challenge to it.
+- **🔵 Blind Spots & Missing Considerations** — what wasn't addressed that should have been.
+- **⚪ Hallucination Risk Flags** — specific claims that stay unverifiable after you tried to check them.
+- **🔄 Strongest Counterargument** — the most compelling case against the main conclusion. Prose, one paragraph. **Not numbered.**
+- **📋 Recommended Actions** — every numbered item from the five categories above, mirrored row-for-row.
+- **➕ Held back** — one line, only if the global cap trimmed anything.
+- **🏁 Verdict** (last line) — Ship it / Ship with changes / Rethink it. Always the final line of the report.
 
 Omit any of Critical, Major, Assumptions, Blind Spots, or Hallucination Risk Flags that genuinely has nothing — don't pad with "none found." Always keep ✅ What Holds Up, 📋 Recommended Actions, and the 🏁 Verdict.
 
 ## Numbering
 
 - **One continuous sequence** for the whole report: Critical → Major → Assumptions → Blind Spots → Hallucination, in that order. Numbers do not restart per category.
+- **The category headers are not list boundaries.** Each category now renders as its own `##` header (see Structure above); that visual break is cosmetic only. The first item under "Assumptions Under Challenge" is never `1.` unless Assumptions is the *first* category in the report with any items — if Critical/Major already used numbers 1–5, Assumptions starts at `6`, and Blind Spots' first item continues from wherever Assumptions ended, not from `1` again.
 - Numbers are assigned to the **final rendered set only**, after the global cap (below) is applied — no gaps.
 - The Recommended Actions table reuses these exact numbers, in the same order.
 - Numbering happens once, during final synthesis/rendering — never at the per-lens dispatch stage (see "Never surface per-lens output" below).
