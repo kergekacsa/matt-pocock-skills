@@ -1,15 +1,15 @@
 ---
 name: wrap-up
-description: "Close out a work session: run the test suite — the only thing this skill runs itself — then report on everything else (full-review/code-review, documentation, acceptance criteria) as done, unfinished, or missing, without running any of it, plus a separate non-blocking tracker-status check at ticket close. Failing or incomplete tests, or any reported-missing review/docs/AC item, block the commit offer by default; the user can explicitly override a specific blocker to proceed anyway, this session only. Never changes anything without an explicit yes. Use when the user says 'wrap up', 'are we done', 'what's left', 'did we commit everything', or 'close out'."
+description: "Close out a work session: run the test suite — the only thing this skill runs itself — then report on everything else (full-review/code-review, documentation, acceptance criteria) as done, unfinished, or missing, without running any of it. Use when the user says 'wrap up', 'are we done', or 'close out'."
 ---
 
 # Wrap-Up
 
 You are the person who, at the end of a work session, stops and asks "okay — what did we actually do, why did we do it, and what's actually finished?" You run the one check that's genuinely this skill's job, report honestly on everything else, and hand control back to the user.
 
-## What this skill does NOT do
+## Scope — only the test suite is wrap-up's to run
 
-This skill runs **only the test suite** itself. It never runs `/full-review`, `/code-review-matt`, `/da-review`, `/brooks-review`, or any other check on the user's behalf — those are the user's to invoke, on their own schedule. If one of them hasn't run this session, or ran but left findings unresolved, wrap-up reports that plainly as missing or unfinished. It does not chase it down, does not offer to run it for the user, and does not fix anything itself.
+This skill runs **only the test suite** itself — everything else (`/full-review`, `/code-review-matt`, `/da-review`, `/brooks-review`, docs, fixes) stays the user's to invoke, on their own schedule. If one of them hasn't run this session, or ran but left findings unresolved, wrap-up reports that plainly as missing or unfinished, then leaves it there.
 
 ## Prime directive — verify freely, never mutate without a yes
 
@@ -37,7 +37,7 @@ Read-only — for each item below, look at this session's conversation and tool-
 
 Mark each item ✅ done / ⚠️ unfinished (it ran, but something's still open) / ❌ missing (never ran) / ❓ can't tell — based on evidence, never optimism.
 
-Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's checked separately in Step 8, since it bears on closing the ticket, not on whether the code itself is safe to commit.
+Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's checked separately in Step 9, since it bears on closing the ticket, not on whether the code itself is safe to commit.
 
 ## Step 4 — Write the summary
 
@@ -82,13 +82,17 @@ If anything was overridden rather than fixed, name it plainly in the interactive
 
 Propose the commit via an interactive prompt. Act only after an explicit yes.
 
-## Step 8 — Close the ticket
+## Step 8 — Tick acceptance-criteria checkboxes
 
-Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** — "met" meaning every individual criterion is confirmed satisfied (see Step 3), read from an existing report, not derived here. If AC status is `not checked` or reports anything unmet, don't offer this — say plainly what's unresolved instead. If there's no ticket at all, this step doesn't apply — skip it, there's nothing to close.
+Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** — definition in Step 3. If AC status is `not checked` or reports anything unmet, don't offer this or Step 9 — say plainly what's unresolved instead. If there's no ticket at all, or the ticket has no acceptance-criteria checkboxes, this step doesn't apply — go straight to Step 9.
+
+Match each checkbox to the specific criterion Step 3's report confirmed as met, and list the literal checkbox text in the proposal so the user can catch any mismatch before confirming. Tick only the checkboxes with an unambiguous match; leave any checkbox the report didn't explicitly address unticked and call it out in the same proposal — it means the ticket's checklist doesn't fully line up with what was reviewed. Propose it via its own interactive prompt. Act only after an explicit yes. If ticking spans multiple boxes and only some succeed, report exactly which ones landed and which didn't — never present a partial tick-off as fully done.
+
+## Step 9 — Close the ticket
+
+Reachable once Step 8 is resolved (ticked, or skipped because there was nothing to tick). If there's no ticket at all, this step doesn't apply — skip it, there's nothing to close.
 
 Before proposing the flip, check whether anything else about the ticket is stale (labels, links, a status that should already reflect this work) — this is wrap-up's own read-only check, not read from any report — and name it alongside the proposal so it isn't closed over silently.
-
-If the ticket has acceptance-criteria checkboxes, match each one to the specific criterion Step 3's report confirmed as met, and list the literal checkbox text in the proposal so the user can catch any mismatch before confirming. Tick only the checkboxes with an unambiguous match; leave any checkbox the report didn't explicitly address unticked and call it out in the same proposal — it means the ticket's checklist doesn't fully line up with what was reviewed. This is a mutation like any other: propose it as its own interactive prompt, separate from the status flip below, so the user can approve one without the other. Act only after an explicit yes. Never tick a box the report didn't confirm as met. If ticking spans multiple boxes and only some succeed, report exactly which ones landed and which didn't — never present a partial tick-off as fully done.
 
 Propose flipping the ticket's status (e.g. to done/closed) via its own interactive prompt. Act only after an explicit yes.
 
