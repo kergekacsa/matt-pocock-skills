@@ -61,10 +61,16 @@ Omit any of Critical, Major, Assumptions, Blind Spots, or Hallucination Risk Fla
 
 ## Item format
 
+`N` below is always a placeholder for "the next number in the report's single running
+sequence" — never copy it as a literal `1`. A Major item is never `1.` unless it is
+genuinely the first numbered item in the entire report (i.e. Critical had zero items).
+If Critical already used 1–2, the first Major item is `3.`, the first Assumption after
+that continues from there, and so on — see Numbering above.
+
 **Critical / Major** — full expansion, attributed to the lens that found it:
 
 ```
-1. **[concern in one line]** — Critical · Blocking: Yes
+N. **[concern in one line]** — Critical · Blocking: Yes
    - **Surfaced by:** [lens / framework]
    - **What I see:** [specific — cite files, lines, claims]
    - **Why it matters:** [the consequence if it ships as-is]
@@ -76,7 +82,7 @@ Severity is `Critical` or `Major`. Blocking is judged per item, honestly — nev
 **Assumptions / Blind Spots / Hallucination Risk Flags** — terse, one line, no sub-bullet expansion:
 
 ```
-6. [assumption / blind spot / unconfirmed claim, one line] — Action: [specific step] · Blocking: No
+N. [assumption / blind spot / unconfirmed claim, one line] — Action: [specific step] · Blocking: No
 ```
 
 These three categories have no severity rubric, so **Blocking is always `No`** for them by definition — only Critical/Major items can ever read `Blocking: Yes`. Still give each a concrete Action; if there's genuinely no "what to do," drop the item (every concern must be actionable).
