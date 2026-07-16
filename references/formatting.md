@@ -71,6 +71,7 @@ Reach for a diagram when it earns its place — e.g. a failure cascade, a depend
 
 - Headers on every column.
 - Aligned separators for readability in source.
+- Comma-separated lists inside a cell: space after each comma (e.g. `1, 3, 4`) so the cell wraps.
 
 ### Other
 
