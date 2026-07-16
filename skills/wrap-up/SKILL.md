@@ -33,7 +33,7 @@ Read-only — for each item below, look at this session's conversation and tool-
 
 - **Full review / code review.** Did `/full-review` (or a narrower single-dimension skill run on its own — `/code-review-matt`, `/brooks-review`, `/da-review`) run this session, covering this session's current diff? If yes, note what it found and whether any finding is still unresolved. If no run covers the current diff, mark it **missing** — this session's changes have not been reviewed.
 - **Documentation.** Is there evidence in this session that docs describing changed behavior were checked or updated? If there's no such evidence, mark **not checked** — don't assume it's fine because the change looked small.
-- **Acceptance criteria.** If a review report from this session already states AC status, use it verbatim — don't re-derive it. Otherwise mark **not checked**. (In practice this only comes up when the user has already chosen to override the missing-review blocker below, since that's the same report this would otherwise come from.)
+- **Acceptance criteria.** If a review report from this session already states AC status per individual criterion, use it verbatim — don't re-derive it. "Met" means every individual criterion is confirmed satisfied by that report; a report that only gives a blanket "AC met" without addressing each criterion individually doesn't qualify — mark it **not checked** instead. Otherwise mark **not checked**. (In practice this only comes up when the user has already chosen to override the missing-review blocker below, since that's the same report this would otherwise come from.)
 
 Mark each item ✅ done / ⚠️ unfinished (it ran, but something's still open) / ❌ missing (never ran) / ❓ can't tell — based on evidence, never optimism.
 
@@ -84,11 +84,13 @@ Propose the commit via an interactive prompt. Act only after an explicit yes.
 
 ## Step 8 — Close the ticket
 
-Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** (read from an existing report, not derived here). If AC status is `not checked` or reports anything unmet, don't offer this — say plainly what's unresolved instead. If there's no ticket at all, this step doesn't apply — skip it, there's nothing to close.
+Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** — "met" meaning every individual criterion is confirmed satisfied (see Step 3), read from an existing report, not derived here. If AC status is `not checked` or reports anything unmet, don't offer this — say plainly what's unresolved instead. If there's no ticket at all, this step doesn't apply — skip it, there's nothing to close.
 
 Before proposing the flip, check whether anything else about the ticket is stale (labels, links, a status that should already reflect this work) — this is wrap-up's own read-only check, not read from any report — and name it alongside the proposal so it isn't closed over silently.
 
-Propose flipping the ticket's status (e.g. to done/closed) via an interactive prompt. Act only after an explicit yes.
+If the ticket has acceptance-criteria checkboxes, match each one to the specific criterion Step 3's report confirmed as met, and list the literal checkbox text in the proposal so the user can catch any mismatch before confirming. Tick only the checkboxes with an unambiguous match; leave any checkbox the report didn't explicitly address unticked and call it out in the same proposal — it means the ticket's checklist doesn't fully line up with what was reviewed. This is a mutation like any other: propose it as its own interactive prompt, separate from the status flip below, so the user can approve one without the other. Act only after an explicit yes. Never tick a box the report didn't confirm as met. If ticking spans multiple boxes and only some succeed, report exactly which ones landed and which didn't — never present a partial tick-off as fully done.
+
+Propose flipping the ticket's status (e.g. to done/closed) via its own interactive prompt. Act only after an explicit yes.
 
 ## Notes
 
