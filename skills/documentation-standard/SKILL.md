@@ -121,7 +121,7 @@ Every document must include a 4-line header:
 
 ### Diagrams
 
-Follow `references/formatting.md` for diagram type selection and Mermaid guidelines.
+Follow `../../references/formatting.md` for diagram type selection and Mermaid guidelines.
 
 ### Code Examples
 - Keep examples under 30 lines

@@ -65,7 +65,7 @@ Reach for a diagram when it earns its place — e.g. a failure cascade, a depend
 ### Links
 
 - Descriptive link text — never "click here" or bare URLs.
-- Relative paths for internal links.
+- Relative paths for internal links between repo files; chat-response file references follow the harness's own convention (e.g. absolute paths for Nimbalyst file-reference links).
 
 ### Tables
 
