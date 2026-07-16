@@ -1,8 +1,27 @@
 ---
 name: full-review
-description: |
-  Read-only technical gate for any code scope — a PR, a commit range, uncommitted changes, a whole directory or module, or an explicit file list — across every technical dimension: does it work, does it match spec (or its own design doc, for a whole-scope review), is the documentation current, is it clean, are the tests good, does it respect architecture. Delegates each dimension to the skill that already owns it, then aggregates into one report. Triggers when: user wants a full/complete technical review of a PR, diff, directory, or module, or asks "is this safe to merge". Do NOT trigger for: (1) closing out your own session's work — use `/wrap-up`, which checks that this skill ran and handles the commit/tracker steps this skill deliberately never does; (2) a single-dimension check — use `/brooks-review`, `/brooks-debt`, `/brooks-test`, `/brooks-audit`, or `/code-review-matt` directly when only one angle is wanted; (3) reviewing a GitHub PR through the built-in reviewer — use `/review`, unless the deeper multi-dimension pass here is specifically wanted; (4) a quick composite health-score dashboard for a directory/module — use `/brooks-health`, which runs abbreviated, capped scans across the same underlying dimensions for a fast score. Reserve this skill's no-diff mode for when the full-depth pass, mandatory adversarial challenge, or the design-doc/doc-drift audits are specifically wanted, not just a number.
+description: >
+  Read-only technical gate for any code scope — a PR, a commit range, uncommitted
+  changes, a whole directory or module, or an explicit file list — across every
+  technical dimension: does it work, does it match spec (or its own design doc, for a
+  whole-scope review), is the documentation current, is it clean, are the tests good,
+  does it respect architecture. Delegates each dimension to the skill that already owns
+  it, then aggregates into one report.
+  Triggers when: user wants a full/complete technical review of a PR, diff, directory,
+  or module, or asks "is this safe to merge".
+  Do NOT trigger for: (1) closing out your own session's work — use `/wrap-up`, which
+  checks that this skill ran and handles the commit/tracker steps this skill
+  deliberately never does; (2) a single-dimension check — use `/brooks-review`,
+  `/brooks-debt`, `/brooks-test`, `/brooks-audit`, or `/code-review-matt` directly when only
+  one angle is wanted; (3) reviewing a GitHub PR through the built-in reviewer — use
+  `/review`, unless the deeper multi-dimension pass here is specifically wanted; (4) a
+  quick composite health-score dashboard for a directory/module — use `/brooks-health`,
+  which runs abbreviated, capped scans across the same underlying dimensions for a fast
+  score. Reserve this skill's no-diff mode for when the full-depth pass, mandatory
+  adversarial challenge, or the design-doc/doc-drift audits are specifically wanted, not
+  just a number.
 ---
+
 # Full Review
 
 Read-only technical gate for any code scope. Every dimension below is delegated to the
