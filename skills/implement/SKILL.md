@@ -26,3 +26,7 @@ Re-run /full-review after each fix pass, capped at 3 rounds. Stop early once a p
 reports nothing left but flagged human-decision items. If the cap is hit first, stop and
 report every unresolved finding. Either way, end with a summary listing every flagged
 human-decision item and any findings left unresolved by the cap.
+
+Do not commit. Remind the user to run /full-review before committing. If the user wants
+to commit without running /full-review first, ask for explicit confirmation — except for
+a typo fix or equally trivial change, where /full-review is not needed.
