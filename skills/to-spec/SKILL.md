@@ -56,6 +56,19 @@ Do NOT include specific file paths or code snippets. They may end up being outda
 
 Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
+## UI/UX
+
+Include this section only when the feature has a user-facing surface (a page, view, or rendered component). For backend-only or headless work, omit it and say why.
+
+Synthesise the design decisions already reached in the conversation — do not invent them:
+
+- Layout — the arrangement of the surface (an ASCII wireframe is enough)
+- Key interactions — what happens on hover, click, expand, filter, submit
+- Responsive behavior — what reflows or collapses, and at which breakpoints
+- Component inventory — which components from the project's existing library each part uses
+
+If a UI design question is still open, resolve it before publishing the spec: run `/prototype` (UI branch) to explore what it should look like, or `/ux-expert` (Phases 3–4) to produce a redesign spec, then fold the answer in here. A prototype's validated layout can be inlined the same way a logic snippet is, per the Implementation Decisions exception above.
+
 ## Testing Decisions
 
 A list of testing decisions that were made. Include:

@@ -54,14 +54,14 @@ provides, and never runs two skills that would find the same thing twice.
 
 ## Process
 
-Step 1 below resolves which mode applies. Steps 2–7 — the per-dimension checks — live
+Step 1 below resolves which mode applies. Steps 2–7a — the per-dimension checks — live
 in two sibling guides so each mode's process stays self-contained instead of threading
 `diff`-branches through every step: `diff-review-guide.md` for the diff path (PR /
 commit range / uncommitted changes — the primary use case), `no-diff-review-guide.md`
 for a whole-scope target (directory / module / file list). Steps 8–9 (adversarial
 challenge, aggregate report) apply the same way to both modes and stay below.
 
-The two guides share the same six step headings by design (Steps 2–7, same order,
+The two guides share the same seven step headings by design (Steps 2–7a, same order,
 same names) — when a change alters what one of those steps means or covers, apply the
 same conceptual change to its counterpart in the other guide, even though the two
 bodies diverge in mode-specific detail.
@@ -101,7 +101,7 @@ explicitly here, not just implicitly via which guide gets read next, is what mak
 misroute visible in the report instead of silently swapping the whole check set.
 
 This **diff** fact — not the named type directly — is what selects the guide for
-Steps 2–7: a diff exists for PR/commit-range/uncommitted targets, and doesn't for
+Steps 2–7a: a diff exists for PR/commit-range/uncommitted targets, and doesn't for
 directory/module/file-list targets.
 
 **Trivial-diff fast lane.** The file-count and line-change signal captured above isn't
@@ -113,12 +113,13 @@ scope-calibration rules already scale its scan down for small diffs (see its gui
 cap full-review adds on top). State explicitly when a step right-sizes this way and
 why — never silently skip a dimension outright.
 
-### 2–7. Dimension checks
+### 2–7a. Dimension checks
 
 Read `diff-review-guide.md` (diff = yes) or `no-diff-review-guide.md` (diff = no) in
-this directory and follow its Steps 2–7 in order: functional correctness, spec
-compliance, documentation completeness, code quality and decay risks, test quality, and
-architecture impact.
+this directory and follow its Steps 2–7a in order: functional correctness, spec
+compliance, documentation completeness, code quality and decay risks, test quality,
+architecture impact, and UI/UX quality (Step 7a, only when the change touches a rendered
+UI surface).
 
 ### 8. Adversarial challenge
 
@@ -126,8 +127,8 @@ Run `/da-review` on every review — this is not optional. Give it a concrete ta
 an explicit size signal (the file count, and for a diff target the line-change count,
 that Step 1 already resolved) — never hand it only "everything gathered" with no
 underlying files or size context to work from. The target itself: for a diff target,
-the diff plus everything gathered in Steps 2–7 as context; for a no-diff target, the
-scope's current source files themselves, with everything gathered in Steps 2–7 passed as
+the diff plus everything gathered in Steps 2–7a as context; for a no-diff target, the
+scope's current source files themselves, with everything gathered in Steps 2–7a passed as
 prior context to challenge. For a genuinely trivial diff (a handful of modified lines,
 no behavioral consequence) or a small no-diff scope (a handful of files), `/da-review`
 right-sizes itself to an inline challenge rather than a delegated multi-lens pass, per

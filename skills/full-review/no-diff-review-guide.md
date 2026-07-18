@@ -1,4 +1,4 @@
-# Full Review — No-Diff Mode Guide (Steps 2–7)
+# Full Review — No-Diff Mode Guide (Steps 2–7a)
 
 For a directory, module, or explicit file-list target — Step 1 (in `SKILL.md`) already
 resolved `diff = no` and the scope. Steps 8–9 (adversarial challenge, aggregate report)
@@ -94,3 +94,13 @@ against nothing.
 Always run `/brooks-audit` on the scope — reviewing a whole directory/module is
 inherently an architecture-relevant scope, and there's no diff-based trigger to
 evaluate.
+
+### 7a. UI/UX quality
+
+Run `/ux-expert` in audit mode if the scope contains a rendered UI surface — a page,
+view, or renderable component (decide concretely, the same way Step 2 determines a
+runtime surface). Skip for a scope with no UI (pure backend, types, config, or docs) and
+say so. `/ux-expert` audits the scope's current UI across its 8 UX dimensions, rating
+each finding Critical/Major/Minor/Enhancement; present its findings verbatim under this
+section. Constrain it to its audit phases (Understand + Audit) — never enter the
+redesign/spec phases here.

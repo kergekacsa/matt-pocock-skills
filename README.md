@@ -22,12 +22,13 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 - **[ask-matt](./skills/ask-matt/SKILL.md)** — Router: ask which skill or flow fits your situation.
 - **[grill-with-docs](./skills/grill-with-docs/SKILL.md)** — Grilling session that builds your project's domain model, sharpening terminology and updating `CONTEXT.md` and ADRs inline.
-- **[triage](./skills/triage/SKILL.md)** — Move issues through a state machine of triage roles.
+- **[triage](./skills/triage/SKILL.md)** — Move tickets through a state machine of triage roles.
 - **[improve-codebase-architecture](./skills/improve-codebase-architecture/SKILL.md)** — Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
 - **[setup-matt-pocock-skills](./skills/setup-matt-pocock-skills/SKILL.md)** — Configure a repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo.
-- **[to-issues](./skills/to-issues/SKILL.md)** — Break any plan, spec, or PRD into independently-grabbable issues using vertical slices.
-- **[to-prd](./skills/to-prd/SKILL.md)** — Turn the current conversation into a PRD and publish it to the issue tracker.
+- **[to-tickets](./skills/to-tickets/SKILL.md)** — Break a plan, spec, or conversation into tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker.
+- **[to-spec](./skills/to-spec/SKILL.md)** — Turn the current conversation into a spec (PRD) and publish it to the issue tracker — no interview, just synthesis of what you've already discussed.
 - **[prototype](./skills/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
+- **[ux-expert](./skills/ux-expert/SKILL.md)** — UX design expert for auditing and redesigning pages, dashboards, and data-heavy interfaces across 8 UX dimensions. Feeds `to-spec`'s UI/UX section, and `full-review` delegates its UI/UX audit to it.
 - **[diagnosing-bugs](./skills/diagnosing-bugs/SKILL.md)** — Disciplined diagnosis loop: reproduce → minimise → hypothesise → instrument → fix → regression-test.
 - **[tdd](./skills/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop.
 - **[domain-modeling](./skills/domain-modeling/SKILL.md)** — Build and sharpen a project's domain model; update `CONTEXT.md` and ADRs inline.
@@ -47,7 +48,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 - **[aaa](./skills/aaa/SKILL.md)** — Evaluate and improve ideas, features, architecture, and code against world-class standards.
 - **[devils-advocate](./skills/devils-advocate/SKILL.md)** — Adversarial review of any plan, design, architecture, or code change.
-- **[full-review](./skills/full-review/SKILL.md)** — The heavyweight, full-depth review: any code scope — a PR, commit range, uncommitted diff, directory, or module — checked for correctness (runs the real test suite), spec/design-doc compliance, documentation drift, code quality, test quality, and architecture, plus a mandatory adversarial challenge. Read-only; delegates every check to the skill that owns it, run at full depth (not `brooks-health`'s capped/abbreviated scan). Never mutates. It's a **router**, not a replacement: this removes the duplicated review *logic* that used to live inside `wrap-up`, but `brooks-health`, `brooks-*`, and `code-review-matt` all stay independently invocable for a narrower, single-dimension check — reach for `full-review` when you want every dimension gated at once, and one of the others when you only want its angle.
+- **[full-review](./skills/full-review/SKILL.md)** — The heavyweight, full-depth review: any code scope — a PR, commit range, uncommitted diff, directory, or module — checked for correctness (runs the real test suite), spec/design-doc compliance, documentation drift, code quality, test quality, architecture, and UI/UX (delegated to `ux-expert`'s audit when the change touches a rendered surface), plus a mandatory adversarial challenge. Read-only; delegates every check to the skill that owns it, run at full depth (not `brooks-health`'s capped/abbreviated scan). Never mutates. It's a **router**, not a replacement: this removes the duplicated review *logic* that used to live inside `wrap-up`, but `brooks-health`, `brooks-*`, and `code-review-matt` all stay independently invocable for a narrower, single-dimension check — reach for `full-review` when you want every dimension gated at once, and one of the others when you only want its angle.
 - **[documentation-standard](./skills/documentation-standard/SKILL.md)** — Standards and workflows for creating and maintaining project documentation.
 - **[wrap-up](./skills/wrap-up/SKILL.md)** — Close out a work session: runs only the test suite itself, then reports whether `full-review`/`code-review-matt`/docs/acceptance criteria ran or are still missing — never running any of them. Everything missing blocks the commit offer by default, overridable per-item, this session only. Summarises, proposes a commit, then closes the ticket.
 - **[claude-md-optimizer](./skills/claude-md-optimizer/SKILL.md)** — Slim oversized agent-instruction files (CLAUDE.md / AGENTS.md / copilot-instructions.md) via progressive disclosure, with zero information loss.
@@ -96,10 +97,10 @@ This template draws on several upstream projects:
 
 Terms used consistently across skills and per-repo configuration.
 
-**Issue tracker**: The tool that hosts a repo's issues — GitHub Issues, GitLab Issues, a local `.scratch/` markdown convention, or Nimbalyst. Skills like `to-issues`, `to-prd`, and `triage` read from and write to it.
+**Issue tracker**: The tool that hosts a repo's tickets — GitHub Issues, GitLab Issues, a local `.scratch/` markdown convention, or Nimbalyst. Skills like `to-tickets`, `to-spec`, and `triage` read from and write to it.
 _Avoid_: backlog manager, backlog backend, issue host
 
-**Issue**: A single tracked unit of work inside an issue tracker — a bug, task, PRD, or slice produced by `to-issues`.
-_Avoid_: ticket (use only when quoting external systems that call them tickets)
+**Ticket**: A single tracked unit of work inside an issue tracker — a bug, task, PRD, or slice produced by `to-tickets`.
+_Avoid_: issue as the unit of work (reserve "issue" for the tracker's name — "issue tracker", "GitHub Issues")
 
-**Triage role**: A canonical state-machine label applied to an issue during triage (e.g. `needs-triage`, `ready-for-agent`). Each role maps to a real label string in the issue tracker via `docs/agents/triage-labels.md`.
+**Triage role**: A canonical state-machine label applied to a ticket during triage (e.g. `needs-triage`, `ready-for-agent`). Each role maps to a real label string in the issue tracker via `docs/agents/triage-labels.md`.

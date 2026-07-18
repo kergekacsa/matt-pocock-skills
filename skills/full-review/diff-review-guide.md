@@ -1,4 +1,4 @@
-# Full Review — Diff Mode Guide (Steps 2–7)
+# Full Review — Diff Mode Guide (Steps 2–7a)
 
 For a PR, commit range, branch/tag, or uncommitted/staged changes — Step 1 (in
 `SKILL.md`) already resolved `diff = yes` and the scope. Steps 8–9 (adversarial
@@ -88,3 +88,13 @@ diff crosses module boundaries, changes an import direction, or restructures
 directories. For a routine same-module change, skip this — `/brooks-review`'s own R5
 (Dependency Disorder) check already covers local dependency-direction issues, and a full
 audit would be redundant with it.
+
+### 7a. UI/UX quality
+
+Run `/ux-expert` in audit mode only if the diff touches a rendered UI surface — a page,
+view, or renderable component (grep for component/route definitions or template/JSX
+changes rather than eyeballing). Skip for backend-only, config-only, or docs-only diffs,
+and say so. `/ux-expert` audits the changed surface across its 8 UX dimensions and rates
+each finding Critical/Major/Minor/Enhancement; present its findings verbatim under this
+section. Constrain it to its audit phases (Understand + Audit) — never let it enter the
+redesign/spec phases here, which are collaborative and out of place in a read-only gate.
