@@ -27,6 +27,6 @@ reports nothing left but flagged human-decision items. If the cap is hit first, 
 report every unresolved finding. Either way, end with a summary listing every flagged
 human-decision item and any findings left unresolved by the cap.
 
-Do not commit and do not close any ticket. Remind the user to run /full-review first.
-If the user wants to commit or close a ticket without running /full-review, ask for
+Do not commit and do not close any ticket. Remind the user to run /wrap-up first.
+If the user wants to commit or close a ticket without running /wrap-up, ask for
 explicit confirmation — except for a typo fix or equally trivial change.
