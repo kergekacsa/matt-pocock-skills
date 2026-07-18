@@ -82,6 +82,14 @@ If anything was overridden rather than fixed, name it plainly in the interactive
 
 Propose the commit via an interactive prompt. Act only after an explicit yes.
 
+## Step 7a — Worktree merge and cleanup
+
+Runs only if the session is operating inside a git worktree (`git worktree list` shows more than one entry and the working directory matches an entry that is not the main worktree).
+
+After the commit lands in Step 7, ask via an interactive prompt whether to merge this worktree's branch into the branch it was created from, and then delete the worktree. Propose merge and deletion together in one prompt — act on each only after an explicit yes to that specific action. If the merge produces conflicts, stop and report them; do not attempt to resolve them automatically.
+
+If not on a worktree, skip this step entirely.
+
 ## Step 8 — Tick acceptance-criteria checkboxes
 
 Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** — definition in Step 3. If AC status is `not checked` or reports anything unmet, don't offer this or Step 9 — say plainly what's unresolved instead. If there's no ticket at all, or the ticket has no acceptance-criteria checkboxes, this step doesn't apply — go straight to Step 9.
