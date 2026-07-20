@@ -123,8 +123,8 @@ why — never silently skip a dimension outright.
 Read `diff-review-guide.md` (diff = yes) or `no-diff-review-guide.md` (diff = no) in
 this directory and follow its Steps 2–7a in order: functional correctness, spec
 compliance, documentation completeness, code quality and decay risks, test quality,
-architecture impact, and UI/UX quality (Step 7a, only when the change touches a rendered
-UI surface).
+architecture impact, and UI/UX quality (Step 7a — always runs: either audits the
+existing UI surface, or checks whether a UI should have been delivered).
 
 ### 8. Adversarial challenge
 

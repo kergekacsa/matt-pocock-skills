@@ -97,10 +97,35 @@ evaluate.
 
 ### 7a. UI/UX quality
 
-Run `/ux-expert` in audit mode if the scope contains a rendered UI surface — a page,
-view, or renderable component (decide concretely, the same way Step 2 determines a
-runtime surface). Skip for a scope with no UI (pure backend, types, config, or docs) and
-say so. `/ux-expert` audits the scope's current UI across its 8 UX dimensions, rating
-each finding Critical/Major/Minor/Enhancement; present its findings verbatim under this
-section. Constrain it to its audit phases (Understand + Audit) — never enter the
-redesign/spec phases here.
+**Step A — Detect a rendered UI surface.** Decide concretely (grep for component/route
+definitions, page/view files, JSX/template patterns — same method as Step 2's runtime
+surface check). If found, run `/ux-expert` in audit mode on the scope's current UI.
+`/ux-expert` audits across its 8 UX dimensions, rating each finding
+Critical/Major/Minor/Enhancement; present its findings verbatim. Constrain it to its
+audit phases (Understand + Audit) — never enter the redesign/spec phases here.
+
+**Step B — If no UI surface exists in the scope** (pure backend, types, config, or
+docs): do not silently skip. Actively check whether a UI *should* exist — the scope may
+be structurally incomplete without one.
+
+Check both sources:
+
+1. **Design doc or spec** (same source as Step 3): does it describe a user-facing flow,
+   screen, or interaction that this scope is meant to support?
+2. **Code itself**: does the scope's purpose require user interaction to be useful?
+   Signals: API endpoints a client is expected to call, user-visible data being created
+   or mutated, user-initiated workflows implemented server-side without any entry point,
+   or a feature that is inaccessible without a frontend.
+
+Based on what you find, emit **one** of these outcomes explicitly — never silently omit
+this step:
+
+- **UI expected but missing** — the spec or code clearly implies a user-facing surface
+  that this scope does not contain. Flag this as a gap: name the expected UI and mark it
+  unaddressed.
+- **UI status unclear** — the spec or code is ambiguous about whether a UI is needed.
+  Flag the uncertainty: state what was checked and what remains unresolved so the
+  reviewer can confirm intent.
+- **No UI needed** — the scope is clearly internal (background service, migration,
+  infrastructure, pure library, CLI tool with no user-facing surface). State the specific
+  reason this was determined, not just the label.

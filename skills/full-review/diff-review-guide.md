@@ -91,10 +91,34 @@ audit would be redundant with it.
 
 ### 7a. UI/UX quality
 
-Run `/ux-expert` in audit mode only if the diff touches a rendered UI surface — a page,
-view, or renderable component (grep for component/route definitions or template/JSX
-changes rather than eyeballing). Skip for backend-only, config-only, or docs-only diffs,
-and say so. `/ux-expert` audits the changed surface across its 8 UX dimensions and rates
-each finding Critical/Major/Minor/Enhancement; present its findings verbatim under this
-section. Constrain it to its audit phases (Understand + Audit) — never let it enter the
-redesign/spec phases here, which are collaborative and out of place in a read-only gate.
+**Step A — Detect a rendered UI surface.** Grep the diff for component/route definitions,
+template or JSX changes, page or view files. If found, run `/ux-expert` in audit mode on
+the changed surface. `/ux-expert` audits across its 8 UX dimensions and rates each
+finding Critical/Major/Minor/Enhancement; present its findings verbatim. Constrain it to
+its audit phases (Understand + Audit) — never enter the redesign/spec phases here.
+
+**Step B — If no UI surface exists in the diff** (backend-only, config-only, or
+docs-only): do not silently skip. Actively check whether a UI *should* have been
+delivered — a backend-only change is not automatically complete just because it compiled.
+
+Check both sources:
+
+1. **Ticket / issue** (same source as Step 3): does the description or Acceptance
+   Criteria imply a user-facing flow, screen, or interaction?
+2. **Code itself**: does the new or changed logic serve a use case that requires user
+   interaction to be useful? Signals: exposes a new API endpoint a client is expected to
+   call, creates or mutates user-visible data, implements a user-initiated workflow, or
+   adds a server-side feature that is inaccessible without a corresponding UI entry point.
+
+Based on what you find, emit **one** of these outcomes explicitly — never silently omit
+this step:
+
+- **UI expected but missing** — the ticket or code clearly implies a user-facing surface
+  that was not delivered. Flag this as a gap: name the expected UI and mark it
+  unaddressed.
+- **UI status unclear** — the ticket or code is ambiguous about whether a UI is needed.
+  Flag the uncertainty: state what was checked and what remains unresolved so the
+  reviewer can confirm intent.
+- **No UI needed** — the change is clearly internal (background job, migration,
+  infrastructure, internal library, CLI tool with no user-facing surface). State the
+  specific reason this was determined, not just the label.
