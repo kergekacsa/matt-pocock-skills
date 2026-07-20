@@ -12,7 +12,7 @@ State assumptions explicitly before implementing — if uncertain, ask. When mul
 
 ## Simplicity first
 
-Minimum code that solves the problem. No features beyond what was asked, no abstractions for single-use code, no error handling for impossible scenarios. Follow YAGNI — prefer one-liner solutions where they're clear. Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+Minimum code that solves the problem. No features beyond what was asked, no abstractions for single-use code, no error handling for impossible scenarios. Follow YAGNI — default to one-liner solutions; only expand when a one-liner would genuinely obscure intent. Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
 ## Documentation stays current
 
