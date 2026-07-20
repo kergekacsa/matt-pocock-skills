@@ -85,6 +85,11 @@ resolving to those two facts:
   Auto Scope Detection as `/brooks-review`: `git diff --cached` → `git diff` →
   `git diff main...HEAD` → ask. → scope = changed files, diff = yes under the same
   non-empty condition above (same full stop — Steps 2 through 9 — if it turns out empty).
+  **Before locking the scope**, call `get_session_edited_files` to retrieve the
+  session-modified file list. If that list differs from the uncommitted files resolved
+  above (either is a strict subset, or the two sets diverge), present both lists
+  explicitly and ask the user which scope to review — do not silently pick one. Only
+  proceed once the user confirms the intended scope.
 - **Directory or module** — a path. → scope = every file under that path (respecting
   `.gitignore`), diff = no. **If that path also has uncommitted changes inside it**, ask
   which the user wants (review the uncommitted diff, or the directory's current state)
