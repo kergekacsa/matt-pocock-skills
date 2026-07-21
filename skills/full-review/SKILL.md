@@ -145,7 +145,9 @@ skipped outright. Note whether it ran inline or delegated, and why.
 ### 9. Aggregate report
 
 One report, sectioned exactly as above in order, omitting any step that was skipped
-(with a one-line reason). Close with a single paragraph stating whether every checked
-dimension came back clean. This skill states facts, not a merge decision — the human or
-calling process decides whether to merge; this report just says what each dimension
-found.
+(with a one-line reason). Render each dimension's step name as a Markdown header using
+the project's bold-header convention (e.g. `## **2. Functional correctness**`, not plain
+bold text or a plain paragraph line) — see `references/formatting.md`. Close with a
+single paragraph stating whether every checked dimension came back clean. This skill
+states facts, not a merge decision — the human or calling process decides whether to
+merge; this report just says what each dimension found.
