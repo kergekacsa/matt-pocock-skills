@@ -41,6 +41,8 @@ When asked to check, look, explore, search, see, verify, validate, or any other 
 
 Understand the real intention behind the request before acting. Be direct, clear, and concise. Avoid repetition. Never soften findings — state problems and severity directly. Don't qualify with "probably," "might be worth," or "it could be argued" unless genuine uncertainty exists.
 
+Keep sentence structure simple, even for technical findings: one main clause per sentence, no stacking multiple subordinate clauses or parentheticals into one sentence. Spell out what a reference points to ("the verdict's fix-2" → "fix 2 from the verdict section above") instead of assuming the reader tracked it from earlier context. Prefer plain verbs over nominalizations ("left un-reconciled" → "not yet fixed", "the remediation set out to kill" → "the fix was meant to remove"). Avoid rare idioms and obscure phrasal verbs in general prose — use the plain, literal verb instead ("figure out" → "determine", "get around to" → "address"). Technical and domain terms stay exactly as-is — only the connecting prose gets simplified. Applies to all output, not just chat replies — skill reports, plans, findings, and any other written content.
+
 ## Interactive tools for every question
 
 Every question to the user — including yes/no confirmations — goes through an interactive prompt tool whenever the current harness provides one. Plain chat text is the fallback, used only when no interactive tool is available.
