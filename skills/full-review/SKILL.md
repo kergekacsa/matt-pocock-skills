@@ -58,8 +58,9 @@ Step 1 below resolves which mode applies. Steps 2–7a — the per-dimension che
 in two sibling guides so each mode's process stays self-contained instead of threading
 `diff`-branches through every step: `diff-review-guide.md` for the diff path (PR /
 commit range / uncommitted changes — the primary use case), `no-diff-review-guide.md`
-for a whole-scope target (directory / module / file list). Steps 8–9 (adversarial
-challenge, aggregate report) apply the same way to both modes and stay below.
+for a whole-scope target (directory / module / file list). A third mode, **plan-review**,
+needs neither guide — see Step 1. Steps 8–9 (adversarial challenge, aggregate report)
+apply the same way to all modes and stay below.
 
 The two guides share the same seven step headings by design (Steps 2–7a, same order,
 same names) — when a change alters what one of those steps means or covers, apply the
@@ -98,16 +99,27 @@ resolving to those two facts:
 - **Explicit file list** — specific files named or pasted, not necessarily co-located.
   → scope = exactly those files, diff = no (unless the user separately frames them as a
   change against a known prior state).
+- **Nothing resolves (planning-only session)** — the auto-detection chain above found no
+  diff, and the user gave no PR/commit-range/directory/file-list either. There is
+  genuinely no code target because no files have been written yet (e.g. a planning or
+  grilling session that produced a proposal but no implementation). → **mode =
+  plan-review**. State one shared reason for Steps 2–7a together ("no code exists yet")
+  rather than six near-identical skip lines, then go straight to Step 8 and run
+  `/da-review` once, targeting the plan or proposal as discussed in this session's
+  conversation context (not a file scope) — that single pass is the entire review. Step 9
+  then reports just the da-review result.
 
-State which type was resolved, the resolved **mode** (`diff` or `no-diff`), and the
-scope line — e.g. `Mode: diff — Scope: PR #42 (7 files, ~180 lines changed)` or
-`Mode: no-diff — Scope: directory review — src/auth/ (14 files)`. Stating the mode
+State which type was resolved, the resolved **mode** (`diff`, `no-diff`, or
+`plan-review`), and the scope line — e.g. `Mode: diff — Scope: PR #42 (7 files, ~180
+lines changed)`, `Mode: no-diff — Scope: directory review — src/auth/ (14 files)`, or
+`Mode: plan-review — Scope: session plan/proposal (no files written)`. Stating the mode
 explicitly here, not just implicitly via which guide gets read next, is what makes a
 misroute visible in the report instead of silently swapping the whole check set.
 
 This **diff** fact — not the named type directly — is what selects the guide for
 Steps 2–7a: a diff exists for PR/commit-range/uncommitted targets, and doesn't for
-directory/module/file-list targets.
+directory/module/file-list targets. **plan-review** needs neither guide (see the bullet
+above).
 
 **Trivial-diff fast lane.** The file-count and line-change signal captured above isn't
 only for Step 8's right-sizing (below) — for a genuinely trivial diff (a handful of
@@ -134,9 +146,11 @@ that Step 1 already resolved) — never hand it only "everything gathered" with 
 underlying files or size context to work from. The target itself: for a diff target,
 the diff plus everything gathered in Steps 2–7a as context; for a no-diff target, the
 scope's current source files themselves, with everything gathered in Steps 2–7a passed as
-prior context to challenge. For a genuinely trivial diff (a handful of modified lines,
-no behavioral consequence) or a small no-diff scope (a handful of files), `/da-review`
-right-sizes itself to an inline challenge rather than a delegated multi-lens pass, per
+prior context to challenge; for a **plan-review** target, the session's plan or proposal
+as discussed in conversation, with no Steps 2–7a context since none ran. For a genuinely
+trivial diff (a handful of modified lines, no behavioral
+consequence) or a small no-diff scope (a handful of files), `/da-review` right-sizes
+itself to an inline challenge rather than a delegated multi-lens pass, per
 `devils-advocate`'s own rule ("Challenge small, self-contained targets inline... Don't
 spin up a subagent for a one-liner") — passing the size signal explicitly lets it make
 that call on real numbers instead of inferring from an unmeasured file set. It is never
@@ -151,3 +165,7 @@ bold text or a plain paragraph line) — see `references/formatting.md`. Close w
 single paragraph stating whether every checked dimension came back clean. This skill
 states facts, not a merge decision — the human or calling process decides whether to
 merge; this report just says what each dimension found.
+
+For **plan-review** mode, the report has just two sections: the Step 1 mode/scope line,
+and Step 8's da-review result in full. The closing paragraph states whether the plan held
+up to challenge, not whether code is clean — there is no code.
