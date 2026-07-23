@@ -33,6 +33,7 @@ Icons cost almost no space — use them freely as scanning anchors where they he
 - Keep each diagram focused — one concept per diagram, not everything at once.
 - Use `<br>` for line breaks, never `\n`.
 - Put every node label in double quotes.
+- Replace `;` with `&#59;` in labels — a literal semicolon breaks Mermaid parsing.
 
 Reach for a diagram when it earns its place — e.g. a failure cascade, a dependency tree, a race condition sequence.
 
