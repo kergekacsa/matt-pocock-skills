@@ -32,7 +32,8 @@ Icons cost almost no space — use them freely as scanning anchors where they he
 - `stateDiagram` for state machines and lifecycle flows.
 - Keep each diagram focused — one concept per diagram, not everything at once.
 - Use `<br>` for line breaks, never `\n`.
-- Put every node label in double quotes.
+- Put every node label in double quotes — always, no exceptions. Never judge case-by-case
+  whether a given label needs it.
 - Replace `;` with `&#59;` in labels — a literal semicolon breaks Mermaid parsing.
 
 Reach for a diagram when it earns its place — e.g. a failure cascade, a dependency tree, a race condition sequence.
