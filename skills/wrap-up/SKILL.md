@@ -43,13 +43,14 @@ Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's 
 
 Read-only, same evidence standard as Step 3: scan this session's *conversation* for anything left open — a question the user deferred ("we'll decide that later"), a decision explicitly postponed, or an idea raised in passing. This is deliberately conversational, not code: something already written down in the code (e.g. an existing TODO comment) isn't at risk of being forgotten — it stays visible in the file for the next person who touches it. The risk is exclusively for things that only exist in this session's conversation and vanish once it ends. List every one found; never drop one silently. If nothing surfaces, say so plainly and move on.
 
-Present every item found in a single batched interactive prompt — not one prompt per item. Offer, per item:
+Present every item found in a single batched interactive prompt — not one prompt per item. For each item, recommend the disposition that fits best rather than listing the options neutrally, and feel free to propose something outside this menu when it genuinely fits better. The menu:
 
+- **Fix it now.** If resolving it is small enough to do as part of wrapping up (a quick decision, a small code change), do it directly rather than parking it. If it touches code, re-run Step 2 afterward regardless of how small the fix looks, since it becomes part of what Step 4 summarizes and Step 7 commits.
 - **File it directly, tagged `needs-triage`.** Deliberately lightweight, not `/to-tickets`' full vertical-slice-and-blocking-edges process — most of these items are small enough (a little bug, a misunderstanding, a passing idea) that full ticket-authoring is overkill. State the type using the vocabulary `docs/agents/issue-tracker.md` defines, if it defines one (the issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if not), and apply the `needs-triage` tag so `/triage` picks it up later. Pack the description with everything available — what surfaced it (this session's sweep, or whichever review or discussion raised it), which session, and the full detail discussed — never a one-line stub.
 - **Leave it as an in-code TODO** (untracked; it will surface as debt later — say so in the prompt). Since none of these items originate as code comments, this always means writing a *new* comment into the code — state that plainly too.
 - **Drop it** as not worth tracking.
 
-If the session is part of a `wayfinder` effort, offer the map's "Not yet specified" section as a fourth option for anything not sharp enough to ticket yet, instead of filing directly. Act only after the user's explicit choice for each item.
+If the session is part of a `wayfinder` effort, offer the map's "Not yet specified" section as a further option for anything not sharp enough to ticket yet, instead of filing directly. Act only after the user's explicit choice for each item.
 
 This sweep does not gate the commit (Step 7) — it surfaces loose ends so they're a conscious choice, not a silent gap.
 
