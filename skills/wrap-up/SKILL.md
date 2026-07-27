@@ -94,15 +94,21 @@ Reachable once there are no blockers left, whether because everything was clean 
 
 If anything was overridden rather than fixed, name it plainly in the interactive prompt so the override is visible at the moment of commit, not buried earlier in the transcript.
 
-Propose the commit via an interactive prompt. Act only after an explicit yes.
+Propose the commit via an interactive prompt. Act only after an explicit yes. If the user declines, report plainly what remains uncommitted and end the skill here — Steps 7a, 8, and 9 do not run.
 
 ## Step 7a — Worktree merge and cleanup
 
-Runs only if the session is operating inside a git worktree (`git worktree list` shows more than one entry and the working directory matches an entry that is not the main worktree).
+Runs only if the session is operating inside a git worktree — detect via `git rev-parse --git-common-dir` differing from `git rev-parse --git-dir`. Skip this step entirely if the worktree's HEAD is detached (no branch to merge) or if not on a worktree at all.
 
-After the commit lands in Step 7, ask via an interactive prompt whether to merge this worktree's branch into the branch it was created from, and then delete the worktree. Propose merge and deletion together in one prompt — act on each only after an explicit yes to that specific action. If the merge produces conflicts, stop and report them; do not attempt to resolve them automatically.
+After the commit lands in Step 7:
 
-If not on a worktree, skip this step entirely.
+1. **Confirm the target branch.** Git records no "parent branch" for a worktree or its branch — never assume `main`. Detect a candidate (e.g. the branch currently checked out in the main worktree, or a reflog hint) and confirm it with the user in the same prompt that proposes the merge; state the resolved target explicitly rather than merging against a silent guess.
+2. **Check for an upstream** (`git rev-parse --abbrev-ref --symbolic-full-name @{u}`). No upstream → the branch is private to this session: rebase it onto the target's current tip, from inside the linked worktree. Has an upstream → treat the branch as potentially shared: merge the target into the worktree branch instead of rebasing, run from the main worktree (checking out the target inside the linked worktree isn't possible while it's checked out elsewhere).
+3. **On conflict** (either path): stop and report; do not attempt to resolve automatically. Offer `git rebase --abort` or `git merge --abort` as appropriate. Do not propose worktree removal — leave the worktree exactly as it was.
+4. **On success**, the rebase path finishes with a fast-forward-only merge (`--ff-only`) into the target; the merge path's merge commit lands directly.
+5. **Propose worktree removal as its own, separate confirmation** — never bundled with the merge consent from step 1, since that would gather a "yes" for deletion before the merge outcome is known. Before removing: confirm the worktree's tree is clean (`git status --porcelain` empty) — if not, report the surviving files and stop; never use `--force`. If the session's own working directory is inside the worktree being removed, move to the main worktree path first. Remove with `git worktree remove` (never a raw directory delete), then run `git worktree prune`.
+
+Step 7a never deletes the branch itself, local or remote — only the worktree.
 
 ## Step 8 — Tick acceptance-criteria checkboxes
 
