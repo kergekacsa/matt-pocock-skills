@@ -50,7 +50,7 @@ Present every item found in a single batched interactive prompt — not one prom
 - **Leave it as an in-code TODO** (untracked; it will surface as debt later — say so in the prompt). Since none of these items originate as code comments, this always means writing a *new* comment into the code — state that plainly too.
 - **Drop it** as not worth tracking.
 
-If the session is part of a `wayfinder` effort, offer the map's "Not yet specified" section as a further option for anything not sharp enough to ticket yet, instead of filing directly. Act only after the user's explicit choice for each item.
+If the session is part of a `wayfinder` effort, offer the map's "Not yet specified" section as a further option for anything not sharp enough to ticket yet, instead of filing directly. Every item's choices must include a free-text option so the user can type their own answer instead of picking from the menu. Act only after the user's explicit choice for each item.
 
 This sweep does not gate the commit (Step 7) — it surfaces loose ends so they're a conscious choice, not a silent gap.
 
