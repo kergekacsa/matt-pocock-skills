@@ -108,8 +108,9 @@ After the commit lands in Step 7:
 3. **On conflict** (either path): stop and report; do not attempt to resolve automatically. Offer `git rebase --abort` or `git merge --abort` as appropriate. Do not propose worktree removal — leave the worktree exactly as it was.
 4. **On success**, the rebase path finishes with a fast-forward-only merge (`--ff-only`) into the target; the merge path's merge commit lands directly.
 5. **Propose worktree removal as its own, separate confirmation** — never bundled with the merge consent from step 1, since that would gather a "yes" for deletion before the merge outcome is known. Before removing: confirm the worktree's tree is clean (`git status --porcelain` empty) — if not, report the surviving files and stop; never use `--force`. If the session's own working directory is inside the worktree being removed, move to the main worktree path first. Remove with `git worktree remove` (never a raw directory delete), then run `git worktree prune`.
+6. **Offer to delete the local branch, as its own separate confirmation after the worktree is removed** — git refuses to delete a branch still checked out in a worktree, so this can only happen once step 5 has succeeded. Use `git branch -d` (never `-D`): its built-in safety check refuses deletion unless the branch is fully merged, which is exactly the condition for offering this at all — no need to verify it separately. If `-d` refuses, report why rather than escalating to `-D`.
 
-Step 7a never deletes the branch itself, local or remote — only the worktree.
+Step 7a never touches a remote branch, and never force-deletes a local one — only a local branch git itself confirms is fully merged.
 
 ## Step 8 — Tick acceptance-criteria checkboxes
 
