@@ -34,6 +34,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 - **[domain-modeling](./skills/domain-modeling/SKILL.md)** — Build and sharpen a project's domain model; update `CONTEXT.md` and ADRs inline.
 - **[codebase-design](./skills/codebase-design/SKILL.md)** — Shared vocabulary for designing deep modules.
 - **[resolving-merge-conflicts](./skills/resolving-merge-conflicts/SKILL.md)** — Resolve in-progress git merge/rebase conflicts.
+- **[worktree](./skills/worktree/SKILL.md)** — Create a git worktree from the current branch and confine the rest of the session to it. Pairs with `wrap-up`'s worktree-cleanup step for the merge/teardown at the end.
 
 **Productivity**
 
