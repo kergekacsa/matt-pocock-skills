@@ -52,7 +52,7 @@ Present every item found in a single batched interactive prompt — not one prom
 
 If the session is part of a `wayfinder` effort, offer the map's "Not yet specified" section as a further option for anything not sharp enough to ticket yet, instead of filing directly. Every item's choices must include a free-text option so the user can type their own answer instead of picking from the menu. Act only after the user's explicit choice for each item.
 
-This sweep does not gate the commit (Step 7) — it surfaces loose ends so they're a conscious choice, not a silent gap.
+This sweep does not gate the commit (Step 7) — it surfaces loose ends so they're a conscious choice, not a silent gap. Step 7a runs a twin sweep after the commit for a different output — durable guidance written into the docs, not tickets — and deliberately skips anything already handled here.
 
 ## Step 4 — Write the summary
 
@@ -95,13 +95,27 @@ Reachable once there are no blockers left, whether because everything was clean 
 
 If anything was overridden rather than fixed, name it plainly in the interactive prompt so the override is visible at the moment of commit, not buried earlier in the transcript.
 
-Propose the commit via an interactive prompt. Act only after an explicit yes. If the user declines, report plainly what remains uncommitted and end the skill here — Steps 7a, 8, and 9 do not run.
+Propose the commit via an interactive prompt. Act only after an explicit yes. If the user declines, report plainly what remains uncommitted and end the skill here — Steps 7a, 7b, 8, and 9 do not run.
 
-## Step 7a — Worktree merge and cleanup
+## Step 7a — Capture session learnings
+
+Reachable only **after** the commit lands in Step 7 — a declined commit skips this step (see Step 7). Runs *before* the worktree merge (Step 7b) so its own commit stays on the feature branch and rides that merge.
+
+Read-only sweep first, same evidence standard as Step 3a: scan this session's *conversation* for friction — anything you got wrong, discovered the hard way, or were surprised by — that a future agent would hit again. The friction is the detector; the durable guidance you write down is the fix. Cross-check each candidate against what's already in `CLAUDE.md`, `CLAUDE.local.md`, and the referenced docs, and against what Step 3 and Step 3a already handled this session. Surface an item **only if** it caused real friction **and** isn't already documented **and** wasn't already handled by Step 3 or Step 3a. If nothing clears that bar, say "nothing to capture" and skip straight to Step 7b — no prompt.
+
+For each surfaced item, route it to its best-fit home and propose the exact wording. Write directly only to `CLAUDE.md` or `CLAUDE.local.md` (shared vs. private — pick by whether the guidance helps everyone or just this user) and `docs/agents/*` (a subsystem how-to), defaulting to `CLAUDE.md`/`CLAUDE.local.md` when nothing more specific fits. If an item is genuinely glossary material or a hard-to-reverse decision with a real trade-off, do **not** write it here — flag it and point to `/domain-modeling` (or `/grill-with-docs`), which owns `CONTEXT.md` and `docs/adr/` and their formats.
+
+Present every surfaced item in a single batched interactive prompt — not one prompt per item. Per item, offer: **write it now** (to the proposed doc, as-worded), **re-route** (a different doc), **edit** (fix the wording first), or **drop**. Every item's choices must include a free-text option so the user can answer beyond the menu. Act only after the user's explicit choice for each item.
+
+Any writes to a **checked-in** doc (`CLAUDE.md`, `docs/agents/*`) become their own commit — separate from the Step 7 feature commit, on the same branch — proposed via an interactive prompt and made only after an explicit yes. Every surfaced item must end either committed or dropped before Step 7b runs: the worktree removal there aborts on a dirty tree, and an item left edited-but-uncommitted would strand it. (`CLAUDE.local.md` is gitignored, so a write there never enters a commit and never dirties the tree — it's simply saved in place.)
+
+This step never blocks — like Step 3a, it surfaces loose ends so capturing them is a conscious choice, not a silent gap.
+
+## Step 7b — Worktree merge and cleanup
 
 Runs only if the session is operating inside a git worktree — detect via `git rev-parse --git-common-dir` differing from `git rev-parse --git-dir`. Skip this step entirely if the worktree's HEAD is detached (no branch to merge) or if not on a worktree at all.
 
-After the commit lands in Step 7:
+After the Step 7 commit (and any Step 7a learnings commit) lands:
 
 1. **Confirm the target branch.** Git records no "parent branch" for a worktree or its branch — never assume `main`. Detect a candidate (e.g. the branch currently checked out in the main worktree, or a reflog hint) and confirm it with the user in the same prompt that proposes the merge; state the resolved target explicitly rather than merging against a silent guess.
 2. **Check for an upstream** (`git rev-parse --abbrev-ref --symbolic-full-name @{u}`). No upstream → the branch is private to this session: rebase it onto the target's current tip, from inside the linked worktree. Has an upstream → treat the branch as potentially shared: merge the target into the worktree branch instead of rebasing, run from the main worktree (checking out the target inside the linked worktree isn't possible while it's checked out elsewhere).
@@ -110,7 +124,7 @@ After the commit lands in Step 7:
 5. **Propose worktree removal as its own, separate confirmation** — never bundled with the merge consent from step 1, since that would gather a "yes" for deletion before the merge outcome is known. Before removing: confirm the worktree's tree is clean (`git status --porcelain` empty) — if not, report the surviving files and stop; never use `--force`. If the session's own working directory is inside the worktree being removed, move to the main worktree path first. Remove with `git worktree remove` (never a raw directory delete), then run `git worktree prune`.
 6. **Offer to delete the local branch, as its own separate confirmation after the worktree is removed** — git refuses to delete a branch still checked out in a worktree, so this can only happen once step 5 has succeeded. Use `git branch -d` (never `-D`): its built-in safety check refuses deletion unless the branch is fully merged, which is exactly the condition for offering this at all — no need to verify it separately. If `-d` refuses, report why rather than escalating to `-D`.
 
-Step 7a never touches a remote branch, and never force-deletes a local one — only a local branch git itself confirms is fully merged.
+Step 7b never touches a remote branch, and never force-deletes a local one — only a local branch git itself confirms is fully merged.
 
 ## Step 8 — Tick acceptance-criteria checkboxes
 
