@@ -25,7 +25,9 @@ Collect, without changing anything:
 
 ## Step 2 — Run the tests
 
-The only check this skill performs itself. Identify the project's canonical way to run **all** of its tests — a root test script, CI config, or, for a monorepo, every workspace's suite, not just the one nearest this session's change — and run it. Record pass/fail. If only a subset actually ran (e.g. one workspace because the others couldn't be discovered or invoked), mark this ⚠️ unfinished, not ✅ — a partial run is not a pass, and the unrun portion is its own blocker in Step 5. Don't proceed past a failing or incomplete suite without flagging it as a blocker. If the project has no test suite and nothing invocable (e.g. a documentation-only repo), say so explicitly and mark this step not applicable — never fabricate a result for a suite that doesn't exist.
+The only check this skill performs itself. First check whether every file this session changed is documentation — Markdown files, `docs/**`, README, CHANGELOG, LICENSE, and similar. If so, skip running the suite entirely and mark this step ✅ not applicable, doc-only change — don't spend the time on a run that can't have been affected. Any source or test code in the diff means the full suite still runs as normal, even alongside doc changes.
+
+Otherwise, identify the project's canonical way to run **all** of its tests — a root test script, CI config, or, for a monorepo, every workspace's suite, not just the one nearest this session's change — and run it. Record pass/fail. If only a subset actually ran (e.g. one workspace because the others couldn't be discovered or invoked), mark this ⚠️ unfinished, not ✅ — a partial run is not a pass, and the unrun portion is its own blocker in Step 5. Don't proceed past a failing or incomplete suite without flagging it as a blocker. If the project has no test suite and nothing invocable (e.g. a documentation-only repo), say so explicitly and mark this step not applicable — never fabricate a result for a suite that doesn't exist.
 
 ## Step 3 — Check what else has (and hasn't) happened
 
