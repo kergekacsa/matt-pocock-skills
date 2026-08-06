@@ -11,4 +11,6 @@ description: "Create a git worktree branched from the current branch and confine
 
 4. **Confine the session to it.** Treat `<path>` as the working root for everything that follows: run Bash commands from inside it, and use absolute paths under it for every Read/Write/Edit/Glob/Grep call. State the new working root back to the user once. This holds for the rest of the session — a request to touch something outside the worktree (the original checkout, another path) is a one-off exception for that request, not a standing one.
 
+5. **Stop there.** Setting up and confining to the worktree is this skill's whole job. Do not start implementing, editing project files, or otherwise advancing the task on your own initiative once Step 4 is done — wait for the user's next explicit instruction before touching anything beyond what Steps 1-4 required.
+
 Pairs with `wrap-up`'s worktree-cleanup step, which detects a worktree session and handles merging the branch back and tearing the worktree down at the end — this skill only covers the start.
