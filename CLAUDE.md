@@ -95,6 +95,7 @@ Never commit without explicit approval. Before any `git commit`, present the pro
 ## Coding standards
 
 - SOLID principles and Clean Code — no code smells
+- Comments explain non-obvious why, invariants, or trade-offs — never restate what the code shows. Delete any comment a competent reader could infer from the code alone
 - Resolve all compiler warnings before closing a task
 - Avoid magic numbers — use descriptive named constants
 - Fix failing tests before moving on to the next task
