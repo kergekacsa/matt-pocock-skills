@@ -92,14 +92,20 @@ If I am about to say "that command doesn't exist," the search must already have 
 
 Never commit without explicit approval. Before any `git commit`, present the proposed commit message and the list of staged files using an interactive confirmation prompt — not plain chat text. Act only after the user approves that exact commit.
 
+## Issue tracker: search before filing
+
+If you discover a bug as a side effect of other work — not the session's own target — search existing tracker items for the symptom first, before filing a new one. Check whether an umbrella item already tracks this class of problem (e.g. known drift or a recurring systemic issue). If one exists, comment on it instead of filing a new item; don't create one item per symptom.
+
 ## Coding standards
 
 - SOLID principles and Clean Code — no code smells
+- Design modules deep, not just SOLID-compliant: a small interface hiding a large implementation, per `skills/codebase-design/SKILL.md`'s vocabulary (module, interface, depth, seam). Prefer fewer, deeper modules over splitting responsibilities into many shallow ones
 - Comments explain non-obvious why, invariants, or trade-offs — never restate what the code shows. Delete any comment a competent reader could infer from the code alone
 - Resolve all compiler warnings before closing a task
 - Avoid magic numbers — use descriptive named constants
 - Fix failing tests before moving on to the next task
 - Prefer multi-agent approaches when task complexity warrants it
+- Run `/brooks-audit` before creating a new module, rewriting or refactoring an existing one, or making any change that shifts module boundaries across multiple files, to see the current dependency layering — then re-run it after the change to confirm the layering is still clean
 
 ## Agent routing
 
