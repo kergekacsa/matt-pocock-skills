@@ -51,6 +51,16 @@ provides, and never runs two skills that would find the same thing twice.
   on whether a diff exists.
 - **Skip conditional steps honestly.** If a step is skipped, say so and say why in the
   report — never silently omit it.
+- **Delegating a dimension is not finishing the review.** Steps 3, 5, 6, 7, and 8 hand
+  off to sub-skills through the Skill tool (`/code-review-matt`'s Spec brief,
+  `/brooks-review`/`/brooks-debt`, `/brooks-test`, `/brooks-audit`, `/da-review`). Each
+  of those returns only its own report — none of them write Step 9's aggregate, and none
+  of them track the steps that have no sub-skill of their own: Step 2's test-suite run,
+  Step 3's always-emitted Acceptance-Criteria-coverage subsection, Step 4's documentation
+  check, Step 7a's UI/UX check. Treating the last-called sub-skill's report as the
+  finished review is a failure mode, not a shortcut. Track every step's outcome yourself
+  as you go, and always close by writing Step 9's aggregate report yourself — a
+  delegated sub-skill finishing is not this skill finishing.
 
 ## Process
 
@@ -158,8 +168,10 @@ skipped outright. Note whether it ran inline or delegated, and why.
 
 ### 9. Aggregate report
 
-One report, sectioned exactly as above in order, omitting any step that was skipped
-(with a one-line reason). Render each dimension's step name as a Markdown header using
+Write this yourself, every time — a delegated sub-skill's own report is not a
+substitute for it, even when that sub-skill was the last thing that ran (see
+"Delegating a dimension is not finishing the review" above). One report, sectioned
+exactly as above in order, omitting any step that was skipped (with a one-line reason). Render each dimension's step name as a Markdown header using
 the project's bold-header convention (e.g. `## **2. Functional correctness**`, not plain
 bold text or a plain paragraph line) — see `references/formatting.md`. Close with a
 single paragraph stating whether every checked dimension came back clean. This skill
