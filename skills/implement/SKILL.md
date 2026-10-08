@@ -22,6 +22,10 @@ where one exists) over ad hoc edits; fall back to ad hoc edits only where no suc
 mechanism exists. A fix pass is done only when every checklist is clear — not just the
 ones with a severity tag.
 
+Finishing a step, or a delegated sub-skill returning, does not end the turn. Start the
+next step with a tool call in the same message. End the turn only for a question to the
+user, the final report, or when only a background task remains.
+
 Re-run /full-review after each fix pass, capped at 3 rounds. Stop early once a pass
 reports nothing left but flagged human-decision items. If the cap is hit first, stop and
 report every unresolved finding. Either way, end with a summary listing every flagged

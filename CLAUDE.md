@@ -60,6 +60,10 @@ Match the tool to the question's shape: a single choice uses a simple chooser; m
 
 Always offer an "other"/free-text escape so the user can answer beyond the options you listed.
 
+## Multi-step skills: keep the turn open between steps
+
+In a skill with numbered steps (`/implement`, `/full-review`, `/wrap-up`, and others), finishing a step does not end the turn. A sub-skill or subagent returning its report does not end it either. Never close a message with "Next: …" or "I will now …" unless the tool call that starts that step is in the same message. End the turn only to ask the user a question, to deliver the final report, or when a background task is the only thing left running. In the background case, state in one line what is still running.
+
 ## Verification
 
 Fact-check everything with tools. Never state a file path, function name, configuration value, line number, or behaviour as true without verifying it with Read/Grep/Glob/Bash. Confidence is not verification.
@@ -101,6 +105,7 @@ If you discover a bug as a side effect of other work — not the session's own t
 - SOLID principles and Clean Code — no code smells
 - Design modules deep, not just SOLID-compliant: a small interface hiding a large implementation, per `skills/codebase-design/SKILL.md`'s vocabulary (module, interface, depth, seam). Prefer fewer, deeper modules over splitting responsibilities into many shallow ones
 - Comments explain non-obvious why, invariants, or trade-offs — never restate what the code shows. Delete any comment a competent reader could infer from the code alone
+- A comment states a fact true of the code as it stands, never a fact about its history: don't cite an issue/PR/ticket number, a review round, or what an earlier version did or got wrong. That record already lives in commit history and version control — repeating it in source only rots when the code changes again and nobody updates the callout. (Sometimes called a "journal comment" — a changelog embedded in the file, a practice obsolete since source control exists to do that job.)
 - Resolve all compiler warnings before closing a task
 - Avoid magic numbers — use descriptive named constants
 - Fix failing tests before moving on to the next task

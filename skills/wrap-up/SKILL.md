@@ -15,6 +15,8 @@ This skill runs **only the test suite** itself — everything else (`/full-revie
 
 Verify freely: run the test suite, inspect git/tracker/session state, read what other checks already reported in this session's history (never re-run any of them), ask the user about a blocker — none of that is a mutation. Never mutate — edit or fix code, stage, commit, or touch the tracker (including closing the ticket) — without an explicit yes to that specific action. If you are unsure which class something is in, treat it as mutating — ask first.
 
+Finishing a step does not end the turn. Start the next step with a tool call in the same message. End the turn only for a question to the user (the Step 3a, 6, 7, 7a, 7b, 8 and 9 prompts), the final report, or when only a background task remains.
+
 ## Step 1 — Gather the facts (read-only)
 
 Collect, without changing anything:

@@ -60,7 +60,10 @@ provides, and never runs two skills that would find the same thing twice.
   check, Step 7a's UI/UX check. Treating the last-called sub-skill's report as the
   finished review is a failure mode, not a shortcut. Track every step's outcome yourself
   as you go, and always close by writing Step 9's aggregate report yourself — a
-  delegated sub-skill finishing is not this skill finishing.
+  delegated sub-skill finishing is not this skill finishing. A sub-skill returning its
+  report also does not end the turn: start the next step with a tool call in the same
+  message, and end the turn only for a question to the user, the final report, or when
+  only a background task remains.
 
 ## Process
 
