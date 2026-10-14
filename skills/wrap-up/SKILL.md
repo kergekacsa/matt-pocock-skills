@@ -15,7 +15,9 @@ This skill runs **only the test suite** itself — everything else (`/full-revie
 
 Verify freely: run the test suite, inspect git/tracker/session state, read what other checks already reported in this session's history (never re-run any of them), ask the user about a blocker — none of that is a mutation. Never mutate — edit or fix code, stage, commit, or touch the tracker (including closing the ticket) — without an explicit yes to that specific action. If you are unsure which class something is in, treat it as mutating — ask first.
 
-Finishing a step does not end the turn. Start the next step with a tool call in the same message. End the turn only for a question to the user (the Step 3a, 6, 7, 7a, 7b, 8 and 9 prompts), the final report, or when only a background task remains.
+Finishing a step does not end the turn. Start the next step with a tool call in the same message. End the turn only for a question to the user (the Step 3a, 6, 7, 7a, 7b, 7c, 8 and 9 prompts), the final report, or when only a background task remains.
+
+Batch independent questions. When several questions are ready at once and none depends on another's answer or outcome, ask them in one interactive prompt — at most 3 questions per prompt, each with its own free-text option. A question whose answer or outcome decides what a later one asks, or whether it runs, waits for that outcome. These chains never batch: Step 7a's item choices, then its commit; Step 7b's merge, then worktree removal, then branch deletion; Step 8, then Step 9. Step 8 depends only on the Step 7 commit, so it can join a Step 7a or Step 7c prompt. When Step 7b doesn't run, Step 7c depends only on the Step 7 commit too.
 
 ## Step 1 — Gather the facts (read-only)
 
@@ -30,6 +32,8 @@ Collect, without changing anything:
 The only check this skill performs itself. First check whether every file this session changed is documentation — Markdown files, `docs/**`, README, CHANGELOG, LICENSE, and similar. If so, skip running the suite entirely and mark this step ✅ not applicable, doc-only change — don't spend the time on a run that can't have been affected. Any source or test code in the diff means the full suite still runs as normal, even alongside doc changes.
 
 Otherwise, identify the project's canonical way to run **all** of its tests — a root test script, CI config, or, for a monorepo, every workspace's suite, not just the one nearest this session's change — and run it. Record pass/fail. If only a subset actually ran (e.g. one workspace because the others couldn't be discovered or invoked), mark this ⚠️ unfinished, not ✅ — a partial run is not a pass, and the unrun portion is its own blocker in Step 5. Don't proceed past a failing or incomplete suite without flagging it as a blocker. If the project has no test suite and nothing invocable (e.g. a documentation-only repo), say so explicitly and mark this step not applicable — never fabricate a result for a suite that doesn't exist.
+
+After each run, note any test or temporary databases the run left behind — SQLite files, databases or schemas on a database server, containers the suite started. Count only what this session's runs created: a database that existed before the session (e.g. a persistent test database the suite reuses on purpose) is not a leftover. This is a read-only note; Step 7c offers the cleanup.
 
 A Step 2 result stays valid for the diff it covered. Later code changes from Step 3a make it **stale**, not wrong — the fix is one fresh run once those changes land, never a rerun for each. If Step 2 was skipped as doc-only and a Step 3a fix introduces the session's first code change, that isn't staleness — promote Step 2 from not-applicable to pending and run it for the first time.
 
@@ -49,7 +53,7 @@ Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's 
 
 Read-only, same evidence standard as Step 3: scan this session's *conversation* for anything left open — a question the user deferred ("we'll decide that later"), a decision explicitly postponed, or an idea raised in passing. This is deliberately conversational, not code: something already written down in the code (e.g. an existing TODO comment) isn't at risk of being forgotten — it stays visible in the file for the next person who touches it. The risk is exclusively for things that only exist in this session's conversation and vanish once it ends. List every one found; never drop one silently. If nothing surfaces, say so plainly and move on.
 
-Present every item found in a single batched interactive prompt — not one prompt per item. For each item, recommend the disposition that fits best rather than listing the options neutrally, and feel free to propose something outside this menu when it genuinely fits better. The menu:
+Present every item found in batched interactive prompts of at most 3 items each — not one prompt per item. For each item, recommend the disposition that fits best rather than listing the options neutrally, and feel free to propose something outside this menu when it genuinely fits better. The menu:
 
 - **Fix it now.** If resolving it is small enough to do as part of wrapping up (a quick decision, a small code change), do it directly rather than parking it. If it touches code, mark Step 2 stale instead of re-running immediately — apply every "fix it now" item in this sweep first, then run Step 2 once, before Step 4, to cover them all. One run per sweep, not one per fix; if that run fails and the culprit isn't obvious among several batched fixes, bisect by rerunning after each fix instead of guessing from the combined failure.
 - **File it directly, tagged `needs-triage`.** Deliberately lightweight, not `/to-tickets`' full vertical-slice-and-blocking-edges process — most of these items are small enough (a little bug, a misunderstanding, a passing idea) that full ticket-authoring is overkill. State the type using the vocabulary `docs/agents/issue-tracker.md` defines, if it defines one (the issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if not), and apply the `needs-triage` tag so `/triage` picks it up later. Pack the description with everything available — what surfaced it (this session's sweep, or whichever review or discussion raised it), which session, and the full detail discussed — never a one-line stub.
@@ -80,16 +84,16 @@ Show the summary (Step 4) together with the Step 2 (tests) status, Step 3 (every
 
 If there are no blockers, go straight to **Step 7 (Commit)**.
 
-If there are blockers, walk them one at a time via an interactive prompt — never assume a blanket "proceed anyway":
+If there are blockers, walk them in interactive prompts of at most 3 blockers each, one question per blocker — never assume a blanket "proceed anyway":
 
 > These are blocking the commit right now:
 > 1. Tests failing — [summary]
 > 2. Full-review hasn't run for this diff
 > 3. …
-> For each: fix it now, or override it (I'll state what proceeding without it means first)?
+> For each: fix it now, or override it? (Each override option states what proceeding without it means.)
 
 - **Fix it now** — what this means depends on where the blocker came from. A **Step 2 (tests)** blocker is wrap-up's own to hand off: a failing test routes to the right flow (`/tdd`, a direct fix); a partial run (some suite couldn't be discovered or invoked) routes to making that suite invocable — either way, **re-run Step 2** afterward regardless of how small the fix looks, since a fix to one thing can silently break another. A **Step 3** blocker (missing review, undocumented change) is never wrap-up's to fix or run, full stop: say so, then pause here — the user leaves wrap-up, does the thing themselves (runs `/full-review`, updates the doc), and re-invokes wrap-up to re-check. Wrap-up performs or orchestrates neither kind of fix itself. Any new blocker either path surfaces re-enters this same walk.
-- **Override** — state the concrete consequence of proceeding without it (a failing test staying broken, a suite of unknown status going uncommitted-against, an unreviewed diff going in uninspected, an unchecked AC) and get the user's explicit yes to that specific override before it stops blocking. An override applies to this wrap-up only, not as a standing exception for next time — but it does survive this run's own Step 2 re-runs: a re-run triggered by a different fix doesn't re-litigate an override already granted earlier in this same run. Only genuinely new blockers re-enter this walk.
+- **Override** — state the concrete consequence of proceeding without it (a failing test staying broken, a suite of unknown status going uncommitted-against, an unreviewed diff going in uninspected, an unchecked AC) in that blocker's question, before the user picks. Picking override for that blocker is the explicit yes to that specific override; only then does it stop blocking. An override applies to this wrap-up only, not as a standing exception for next time — but it does survive this run's own Step 2 re-runs: a re-run triggered by a different fix doesn't re-litigate an override already granted earlier in this same run. Only genuinely new blockers re-enter this walk.
 
 Nothing proceeds to Step 7 until every blocker is either fixed or explicitly overridden.
 
@@ -97,11 +101,11 @@ Nothing proceeds to Step 7 until every blocker is either fixed or explicitly ove
 
 Reachable once there are no blockers left, whether because everything was clean or every blocker was explicitly overridden in Step 6.
 
-**Commit hygiene.** The staged set must contain **only this session's changes** — explicitly name and exclude any files that were already dirty at session start.
+**Commit hygiene.** The staged set must contain **only this session's changes** — explicitly name and exclude any files that were already dirty at session start. Never stage the leftover test databases Step 2 recorded — Step 7c handles them.
 
 If anything was overridden rather than fixed, name it plainly in the interactive prompt so the override is visible at the moment of commit, not buried earlier in the transcript.
 
-Propose the commit via an interactive prompt. Act only after an explicit yes. If the user declines, report plainly what remains uncommitted and end the skill here — Steps 7a, 7b, 8, and 9 do not run.
+Propose the commit via an interactive prompt. Act only after an explicit yes. If the user declines, report plainly what remains uncommitted, run Step 7c, then end the skill — Steps 7a, 7b, 8, and 9 do not run. Step 7c still runs because leftover test databases exist whether or not the commit landed.
 
 ## Step 7a — Capture session learnings
 
@@ -111,7 +115,7 @@ Read-only sweep first, same evidence standard as Step 3a: scan this session's *c
 
 For each surfaced item, route it to its best-fit home and propose the exact wording. Write directly only to `CLAUDE.md` or `CLAUDE.local.md` (shared vs. private — pick by whether the guidance helps everyone or just this user) and `docs/agents/*` (a subsystem how-to), defaulting to `CLAUDE.md`/`CLAUDE.local.md` when nothing more specific fits. If an item is genuinely glossary material or a hard-to-reverse decision with a real trade-off, do **not** write it here — flag it and point to `/domain-modeling` (or `/grill-with-docs`), which owns `CONTEXT.md` and `docs/adr/` and their formats.
 
-Present every surfaced item in a single batched interactive prompt — not one prompt per item. Per item, offer: **write it now** (to the proposed doc, as-worded), **re-route** (a different doc), **edit** (fix the wording first), or **drop**. Every item's choices must include a free-text option so the user can answer beyond the menu. Act only after the user's explicit choice for each item.
+Present every surfaced item in batched interactive prompts of at most 3 items each — not one prompt per item. Per item, offer: **write it now** (to the proposed doc, as-worded), **re-route** (a different doc), **edit** (fix the wording first), or **drop**. Every item's choices must include a free-text option so the user can answer beyond the menu. Act only after the user's explicit choice for each item.
 
 Any writes to a **checked-in** doc (`CLAUDE.md`, `docs/agents/*`) become their own commit — separate from the Step 7 feature commit, on the same branch — proposed via an interactive prompt and made only after an explicit yes. Every surfaced item must end either committed or dropped before Step 7b runs: the worktree removal there aborts on a dirty tree, and an item left edited-but-uncommitted would strand it. (`CLAUDE.local.md` is gitignored, so a write there never enters a commit and never dirties the tree — it's simply saved in place.)
 
@@ -132,11 +136,21 @@ After the Step 7 commit (and any Step 7a learnings commit) lands:
 
 Step 7b never touches a remote branch, and never force-deletes a local one — only a local branch git itself confirms is fully merged.
 
+## Step 7c — Clean up test databases
+
+Runs after Step 7b, or straight after Step 7 when the commit was declined. If Step 2 recorded no leftover test or temporary databases, say so in one line and move on.
+
+List every leftover Step 2 recorded, with where it lives (file path, server and database name, or container name). First check that each one still exists — Step 7b's worktree removal can take files inside the worktree with it. Propose deleting the rest in batched interactive prompts of at most 3 databases each: per database, **delete** or **keep**, plus a free-text option. Act only after the user's explicit choice for each. Delete with the tool that owns the database (`DROP DATABASE`, `docker rm`, a file delete), and never touch a database that existed before this session.
+
+If Step 7b stopped the worktree removal only because of files this step just deleted, offer Step 7b's items 5 and 6 again.
+
+This step never blocks — leftover databases are housekeeping, not a correctness problem.
+
 ## Step 8 — Tick acceptance-criteria checkboxes
 
 Reachable only **after** the commit lands in Step 7, and only if Step 3's acceptance-criteria status is **known and met** — definition in Step 3. If AC status is `not checked` or reports anything unmet, don't offer this or Step 9 — say plainly what's unresolved instead. If there's no ticket at all, or the ticket has no acceptance-criteria checkboxes, this step doesn't apply — go straight to Step 9.
 
-Match each checkbox to the specific criterion Step 3's report confirmed as met, and list the literal checkbox text in the proposal so the user can catch any mismatch before confirming. Tick only the checkboxes with an unambiguous match; leave any checkbox the report didn't explicitly address unticked and call it out in the same proposal — it means the ticket's checklist doesn't fully line up with what was reviewed. Propose it via its own interactive prompt. Act only after an explicit yes. If ticking spans multiple boxes and only some succeed, report exactly which ones landed and which didn't — never present a partial tick-off as fully done.
+Match each checkbox to the specific criterion Step 3's report confirmed as met, and list the literal checkbox text in the proposal so the user can catch any mismatch before confirming. Tick only the checkboxes with an unambiguous match; leave any checkbox the report didn't explicitly address unticked and call it out in the same proposal — it means the ticket's checklist doesn't fully line up with what was reviewed. Propose it via an interactive prompt. Act only after an explicit yes. If ticking spans multiple boxes and only some succeed, report exactly which ones landed and which didn't — never present a partial tick-off as fully done.
 
 ## Step 9 — Close the ticket
 
