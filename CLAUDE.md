@@ -45,12 +45,13 @@ Keep sentence structure simple, even for technical findings: one main clause per
 
 Don't use metaphors or invented labels for things that already have a plain name ("the next rung" → "the next step", "the tripwire" → "the check that fails the build"). A term defined in `CONTEXT.md` or in a skill's own vocabulary is not invented — keep it.
 
-Four writing methods apply to all output:
+Five writing methods apply to all output:
 
 - **ASD-STE100 (Simplified Technical English).** Use each word in one meaning only, and pick the common word. Keep instruction sentences under 20 words and descriptive sentences under 25. Write one instruction per sentence.
 - **Minto Pyramid.** Lead with the answer or recommendation. The supporting points come next, then the evidence under each point. Never build up to the conclusion.
 - **SBAR for problems.** Report a problem in four parts, in this order: Situation (what is happening), Background (what led to it), Assessment (what it means), Recommendation (what to do next).
 - **MECE for categories.** When you split findings, options, or criteria into groups, the groups don't overlap and together they cover everything. If one list can't do both, use two separate axes (e.g. severity and area) instead of mixing them in one list.
+- **RFC 2119 for obligation levels.** When you state a requirement, recommendation, or option (in rules, plans, specs, skill instructions, or a finding's action), use the RFC 2119 keywords in uppercase. MUST / MUST NOT mark an absolute rule. SHOULD / SHOULD NOT mark a default that allows a stated reason to deviate. MAY marks a true option. Don't use softer words ("prefer", "feel free", "ideally") for a requirement. Plain description needs no keyword.
 
 ## Interactive tools for every question
 
