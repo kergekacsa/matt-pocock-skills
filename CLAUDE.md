@@ -68,9 +68,18 @@ Pick the tool from what this session actually exposes, in this order:
 
 Match the tool to the question's shape: a single choice uses a simple chooser; multi-part input uses one multi-field prompt — never a chat message with several bullet lists. Yes/no confirmations ("Want me to do X?", "Should I proceed?", "Save this?") are questions too — use a confirm or choice field, not a sentence the user must type a reply to.
 
-Answers, explanations, findings, and context go in normal chat text, where Markdown renders. The interactive prompt holds only the final question: short and precise, with short options. Its intro and description fields show Markdown as raw text, so never put explanations there.
+Answers, explanations, findings, and context go in normal chat text, where Markdown renders. The interactive prompt shows its question, intro, descriptions, and options as raw text, so Markdown does not render there. You MUST NOT use Markdown syntax in a prompt: no bold, backticks, headers, lists, tables, or links. Write plain text. A question and its option descriptions MAY run 2–3 short sentences. Anything longer goes in the chat text.
 
 Always offer an "other"/free-text escape so the user can answer beyond the options you listed.
+
+## Where user-facing text goes
+
+On some models (Opus 5.5, Fable 5 and 5.1, Sonnet 5.5), text written between tool calls is replaced by a short summary, so the user never sees the text you wrote. This affects all user-facing text, not only questions. You MUST put everything the user needs to read in the first text block of a turn or in the final message after the last tool call. You MUST NOT write user-facing text between tool calls.
+
+When a question needs context first:
+
+- **No tool call has run yet in this turn.** Write the context as the first text block, then ask.
+- **Tool calls have already run.** End the turn with the context as the final message, and ask in the next turn. You MAY instead ask a short question with self-explanatory options. The long context still goes in the final message.
 
 ## Multi-step skills: keep the turn open between steps
 
