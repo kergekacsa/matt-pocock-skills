@@ -15,7 +15,9 @@ This skill runs **only the test suite** itself — everything else (`/full-revie
 
 Verify freely: run the test suite, inspect git/tracker/session state, read what other checks already reported in this session's history (never re-run any of them), ask the user about a blocker — none of that is a mutation. Never mutate — edit or fix code, stage, commit, or touch the tracker (including closing the ticket) — without an explicit yes to that specific action. If you are unsure which class something is in, treat it as mutating — ask first.
 
-Finishing a step does not end the turn. Start the next step with a tool call in the same message. End the turn only for a question to the user (the Step 3a, 6, 7, 7a, 7b, 7c, 8 and 9 prompts), the final report, or when only a background task remains.
+Finishing a step does not end the turn. Start the next step with a tool call in the same message. End the turn only for a question to the user (the Step 3a, 6, 7, 7a, 7b, 7c, 8 and 9 prompts), the final report, or when only a background task remains. Step 5 also ends the turn, with the report as the final message.
+
+Text you write between tool calls can be lost before the user reads it. Every prompt in this skill MUST be self-contained: the question and each option stand on their own, at most 4 sentences each, so the user decides without any earlier mid-turn text. Information that needs more than that goes in the final message of a turn that ends, and the prompt opens the next turn. Step 5 is the main case.
 
 Batch independent questions. When several questions are ready at once and none depends on another's answer or outcome, ask them in one interactive prompt — at most 3 questions per prompt, each with its own free-text option. A question whose answer or outcome decides what a later one asks, or whether it runs, waits for that outcome. These chains never batch: Step 7a's item choices, then its commit; Step 7b's merge, then worktree removal, then branch deletion; Step 8, then Step 9. Step 8 depends only on the Step 7 commit, so it can join a Step 7a or Step 7c prompt. When Step 7b doesn't run, Step 7c depends only on the Step 7 commit too.
 
@@ -53,9 +55,9 @@ Tracker staleness (beyond acceptance criteria) is not a commit blocker — it's 
 
 Read-only, same evidence standard as Step 3: scan this session's *conversation* for anything left open — a question the user deferred ("we'll decide that later"), a decision explicitly postponed, or an idea raised in passing. This is deliberately conversational, not code: something already written down in the code (e.g. an existing TODO comment) isn't at risk of being forgotten — it stays visible in the file for the next person who touches it. The risk is exclusively for things that only exist in this session's conversation and vanish once it ends. List every one found; never drop one silently. If nothing surfaces, say so plainly and move on.
 
-Present every item found in batched interactive prompts of at most 3 items each — not one prompt per item. For each item, recommend the disposition that fits best rather than listing the options neutrally, and feel free to propose something outside this menu when it genuinely fits better. The menu:
+List every item found in the Step 5 report. Ask about them in the next turn, in batched interactive prompts of at most 3 items each — not one prompt per item. For each item, recommend the disposition that fits best rather than listing the options neutrally, and feel free to propose something outside this menu when it genuinely fits better. The menu:
 
-- **Fix it now.** If resolving it is small enough to do as part of wrapping up (a quick decision, a small code change), do it directly rather than parking it. If it touches code, mark Step 2 stale instead of re-running immediately — apply every "fix it now" item in this sweep first, then run Step 2 once, before Step 4, to cover them all. One run per sweep, not one per fix; if that run fails and the culprit isn't obvious among several batched fixes, bisect by rerunning after each fix instead of guessing from the combined failure.
+- **Fix it now.** If resolving it is small enough to do as part of wrapping up (a quick decision, a small code change), do it directly rather than parking it. If it touches code, mark Step 2 stale instead of re-running immediately — apply every "fix it now" item in this sweep first, then run Step 2 once, before Step 6, to cover them all. One run per sweep, not one per fix; if that run fails and the culprit isn't obvious among several batched fixes, bisect by rerunning after each fix instead of guessing from the combined failure.
 - **File it directly, tagged `needs-triage`.** Deliberately lightweight, not `/to-tickets`' full vertical-slice-and-blocking-edges process — most of these items are small enough (a little bug, a misunderstanding, a passing idea) that full ticket-authoring is overkill. State the type using the vocabulary `docs/agents/issue-tracker.md` defines, if it defines one (the issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if not), and apply the `needs-triage` tag so `/triage` picks it up later. Pack the description with everything available — what surfaced it (this session's sweep, or whichever review or discussion raised it), which session, and the full detail discussed — never a one-line stub.
 - **Leave it as an in-code TODO** (untracked; it will surface as debt later — say so in the prompt). Since none of these items originate as code comments, this always means writing a *new* comment into the code — state that plainly too.
 - **Drop it** as not worth tracking.
@@ -80,11 +82,13 @@ Show the summary (Step 4) together with the Step 2 (tests) status, Step 3 (every
 
 **Every Step 2 and Step 3 item blocks by default.** A failing or incomplete test suite, or any Step 3 item marked ⚠️/❌/❓, is a blocker on the commit offer (Step 7) — no exceptions among those two steps. Step 3a is the one deliberate exception: it never blocks (see Step 3a). List every current blocker plainly in the report.
 
+**End the turn here.** The report is the final message of this turn. Write nothing before it except tool calls. End it by naming every pending decision as a statement, not a question: the Step 3a open items and the Step 6 blockers. Do not call the prompt tool in this turn. The next turn starts with the Step 3a prompts, then Step 6. If there are no open items and no blockers, the report still ends the turn, and the next turn starts at Step 7.
+
 ## Step 6 — Override or proceed
 
 If there are no blockers, go straight to **Step 7 (Commit)**.
 
-If there are blockers, walk them in interactive prompts of at most 3 blockers each, one question per blocker — never assume a blanket "proceed anyway":
+If there are blockers, walk them in interactive prompts of at most 3 blockers each, one question per blocker — never assume a blanket "proceed anyway". This step runs in the turn after the Step 5 report, after the Step 3a prompts. Use the latest Step 2 result: if a Step 3a fix re-ran the suite, state the new result in the blocker's question. The question looks like this:
 
 > These are blocking the commit right now:
 > 1. Tests failing — [summary]

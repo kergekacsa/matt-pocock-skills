@@ -68,22 +68,29 @@ Pick the tool from what this session actually exposes, in this order:
 
 Match the tool to the question's shape: a single choice uses a simple chooser; multi-part input uses one multi-field prompt — never a chat message with several bullet lists. Yes/no confirmations ("Want me to do X?", "Should I proceed?", "Save this?") are questions too — use a confirm or choice field, not a sentence the user must type a reply to.
 
-Answers, explanations, findings, and context go in normal chat text, where Markdown renders. The interactive prompt shows its question, intro, descriptions, and options as raw text, so Markdown does not render there. You MUST NOT use Markdown syntax in a prompt: no bold, backticks, headers, lists, tables, or links. Write plain text. A question and its option descriptions MAY run 2–3 short sentences. Anything longer goes in the chat text.
+Answers, explanations, findings, and context go in normal chat text, where Markdown renders. The interactive prompt shows its question, intro, descriptions, and options as raw text, so Markdown does not render there. You MUST NOT use Markdown syntax in a prompt: no bold, backticks, headers, lists, tables, or links. Write plain text. The question and each option description MAY run up to 4 sentences, so a question stays well rounded and its answers stay complete. You MUST NOT cut information from a prompt only to make it shorter. Explanation beyond 4 sentences goes in the chat text before the prompt (see "Where user-facing text goes").
 
 Always offer an "other"/free-text escape so the user can answer beyond the options you listed.
 
 ## Where user-facing text goes
 
-On some models (Opus 5.5, Fable 5 and 5.1, Sonnet 5.5), text written between tool calls is replaced by a short summary, so the user never sees the text you wrote. This affects all user-facing text, not only questions. You MUST put everything the user needs to read in the first text block of a turn or in the final message after the last tool call. You MUST NOT write user-facing text between tool calls.
+Text written between tool calls can be replaced by a short summary, so the user never sees the text you wrote. Tests and issue reports (anthropics/claude-code#74558 and #65051) show this on Fable 5, Fable 5.1, and Opus 5.5. Reports also show it on Opus 5, and on Opus 4.8 before MCP tool calls. The docs list Sonnet 5.5 and Mythos 5.1 as progress-update models, but no test confirms the loss there. These rules apply on every model.
+
+The loss affects all user-facing text, not only questions. Text before the first tool call is safer than mid-turn text, but tests still lost it (Fable 5: 2 of 4 markers; Fable 5.1: about 6%). Final messages were almost never affected (0 of the controlled markers; about 0.4% on Fable 5.1). You MUST put everything the user needs to read in the final message of the turn, after the last tool call. You MUST NOT write user-facing text before or between tool calls.
 
 When a question needs context first:
 
-- **No tool call has run yet in this turn.** Write the context as the first text block, then ask.
-- **Tool calls have already run.** End the turn with the context as the final message, and ask in the next turn. You MAY instead ask a short question with self-explanatory options. The long context still goes in the final message.
+- **The context fits the prompt (4 sentences or fewer per field).** Put it in the question and its options, and ask now. The prompt MUST be self-contained.
+- **The context is longer.** End the turn with the context as the final message. End that message by naming the decision that is waiting, as a statement and not a question. For example: Waiting on your decision about X. Ask the full question through the prompt tool in the next turn, after you answer the user's message.
+- **The question cannot wait.** Ask it mid-turn with a self-contained prompt. The longer context goes in the final message as information only.
+
+Before you ask, you MUST write every answer, finding, and recommendation that does not depend on the user's decision. You MUST NOT hold any back until after the question.
+
+If the user's next message does not answer your pending question, you MUST answer that message first and in full. You MUST NOT re-ask the pending question before you answer. You MAY re-ask it once after the answer, only if it still blocks you. If the user still does not answer, state the assumption you will proceed on and continue, or say plainly what is blocked.
 
 ## Multi-step skills: keep the turn open between steps
 
-In a skill with numbered steps (`/implement`, `/full-review`, `/wrap-up`, and others), finishing a step does not end the turn. A sub-skill or subagent returning its report does not end it either. Never close a message with "Next: …" or "I will now …" unless the tool call that starts that step is in the same message. End the turn only to ask the user a question, to deliver the final report, or when a background task is the only thing left running. In the background case, state in one line what is still running.
+In a skill with numbered steps (`/implement`, `/full-review`, `/wrap-up`, and others), finishing a step does not end the turn. A sub-skill or subagent returning its report does not end it either. Never close a message with "Next: …" or "I will now …" unless the tool call that starts that step is in the same message. End the turn only to ask the user a question, to deliver the final report, or when a background task is the only thing left running. A turn that ends with context and a named pending decision (see "Where user-facing text goes") counts as ending the turn to ask a question. In the background case, state in one line what is still running.
 
 ## Verification
 
