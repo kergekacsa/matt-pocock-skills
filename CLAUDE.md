@@ -43,6 +43,15 @@ Understand the real intention behind the request before acting. Be direct, clear
 
 Keep sentence structure simple, even for technical findings: one main clause per sentence, no stacking multiple subordinate clauses or parentheticals into one sentence. Spell out what a reference points to ("the verdict's fix-2" → "fix 2 from the verdict section above") instead of assuming the reader tracked it from earlier context. Prefer plain verbs over nominalizations ("left un-reconciled" → "not yet fixed", "the remediation set out to kill" → "the fix was meant to remove"). Avoid rare idioms and obscure phrasal verbs in general prose — use the plain, literal verb instead ("figure out" → "determine", "get around to" → "address"). Technical and domain terms stay exactly as-is — only the connecting prose gets simplified. Applies to all output, not just chat replies — skill reports, plans, findings, and any other written content.
 
+Don't use metaphors or invented labels for things that already have a plain name ("the next rung" → "the next step", "the tripwire" → "the check that fails the build"). A term defined in `CONTEXT.md` or in a skill's own vocabulary is not invented — keep it.
+
+Four writing methods apply to all output:
+
+- **ASD-STE100 (Simplified Technical English).** Use each word in one meaning only, and pick the common word. Keep instruction sentences under 20 words and descriptive sentences under 25. Write one instruction per sentence.
+- **Minto Pyramid.** Lead with the answer or recommendation. The supporting points come next, then the evidence under each point. Never build up to the conclusion.
+- **SBAR for problems.** Report a problem in four parts, in this order: Situation (what is happening), Background (what led to it), Assessment (what it means), Recommendation (what to do next).
+- **MECE for categories.** When you split findings, options, or criteria into groups, the groups don't overlap and together they cover everything. If one list can't do both, use two separate axes (e.g. severity and area) instead of mixing them in one list.
+
 ## Interactive tools for every question
 
 Every question to the user — including yes/no confirmations — goes through an interactive prompt tool whenever the current harness provides one. Plain chat text is the fallback, used only when no interactive tool is available.
@@ -57,6 +66,8 @@ Pick the tool from what this session actually exposes, in this order:
 - **No interactive tool available** → plain text question, and only then.
 
 Match the tool to the question's shape: a single choice uses a simple chooser; multi-part input uses one multi-field prompt — never a chat message with several bullet lists. Yes/no confirmations ("Want me to do X?", "Should I proceed?", "Save this?") are questions too — use a confirm or choice field, not a sentence the user must type a reply to.
+
+Answers, explanations, findings, and context go in normal chat text, where Markdown renders. The interactive prompt holds only the final question: short and precise, with short options. Its intro and description fields show Markdown as raw text, so never put explanations there.
 
 Always offer an "other"/free-text escape so the user can answer beyond the options you listed.
 
