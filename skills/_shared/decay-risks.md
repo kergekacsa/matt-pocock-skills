@@ -125,6 +125,11 @@ Multiple copies drift apart silently. DRY is about decisions, not code lines.
   (e.g., adding a new payment type requires adding a class in 3 different hierarchies)
 - Configuration values repeated as literals in multiple places
 - Two modules that implement the same algorithm independently
+- Comment restates a decision, bug history, or rationale that already exists in git history — a
+  "journal comment". Two sub-patterns: (a) narrates what a prior version did or cites a review
+  round/issue number instead of stating the current fact; (b) the same explanation is
+  copy-pasted verbatim across multiple functions/call sites instead of stated once and
+  cross-referenced
 
 ### Sources
 
@@ -147,6 +152,8 @@ Multiple copies drift apart silently. DRY is about decisions, not code lines.
 - Repetition across separate bounded contexts is not automatically duplicate knowledge
 - Temporary duplication during an active extraction or migration is not necessarily debt
 - Shared protocol constants repeated at explicit boundaries may be acceptable when local ownership is clearer
+- A short pointer to an ADR, design doc, or issue for a genuinely undocumented cross-file
+  invariant is not a journal comment — it's a live reference, not change-history narration
 
 ---
 
