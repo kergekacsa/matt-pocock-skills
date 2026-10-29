@@ -1,6 +1,6 @@
 # Issue tracker: Nimbalyst local tracker
 
-Issues, tasks, ideas, features, decisions, and plans for this repo live in the **Nimbalyst tracker**, persisted under `.nimbalyst/trackers/` and accessed via the `mcp__nimbalyst-mcp__tracker_*` MCP tools. There is no GitHub Issues fallback — even bug reports from `/feedback:bug-report` go here.
+Issues, tasks, ideas, features, decisions, and plans for this repo live in the **Nimbalyst tracker**, persisted under `.nimbalyst/trackers/` and accessed via the `mcp__nimbalyst-trackers__tracker_*` MCP tools. There is no GitHub Issues fallback — even bug reports from `/feedback:bug-report` go here.
 
 ## Item types
 
@@ -19,14 +19,14 @@ All types support a `tags` array (used for triage state — see `triage-labels.m
 
 ## Conventions
 
-- **Create an item**: `mcp__nimbalyst-mcp__tracker_create` with `type`, `title`, `description`. Apply the triage tag (e.g. `needs-triage`, `ready-for-agent`) via the `tags` field.
-- **Read an item**: `mcp__nimbalyst-mcp__tracker_get` with the item ID or issue key (e.g. `NIM-123`, `bug_01HX…`, `tsk_…`). If the user gives a fuzzy reference, find it first with `tracker_list` + `search`.
-- **List / filter items**: `mcp__nimbalyst-mcp__tracker_list` — filter by `type`, `status`, `priority`, `typeTag`, or `where` field filters.
-- **Comment on an item**: `mcp__nimbalyst-mcp__tracker_add_comment`.
-- **Update fields** (status, priority, tags, owner, title, description): `mcp__nimbalyst-mcp__tracker_update`.
-- **Link a file** to the item: `mcp__nimbalyst-mcp__tracker_link_file`.
-- **Link the current agent session** to the item: `mcp__nimbalyst-mcp__tracker_link_session`.
-- **Inspect a type's schema / valid statuses**: `mcp__nimbalyst-mcp__tracker_list_types`.
+- **Create an item**: `mcp__nimbalyst-trackers__tracker_create` with `type`, `title`, `description`. Apply the triage tag (e.g. `needs-triage`, `ready-for-agent`) via the `tags` field.
+- **Read an item**: `mcp__nimbalyst-trackers__tracker_get` with the item ID or issue key (e.g. `NIM-123`, `bug_01HX…`, `tsk_…`). If the user gives a fuzzy reference, find it first with `tracker_list` + `search`.
+- **List / filter items**: `mcp__nimbalyst-trackers__tracker_list` — filter by `type`, `status`, `priority`, `typeTag`, or `where` field filters.
+- **Comment on an item**: `mcp__nimbalyst-trackers__tracker_add_comment`.
+- **Update fields** (status, priority, tags, owner, title, description): `mcp__nimbalyst-trackers__tracker_update`.
+- **Link a file** to the item: `mcp__nimbalyst-trackers__tracker_link_file`.
+- **Link the current agent session** to the item: `mcp__nimbalyst-trackers__tracker_link_session`.
+- **Inspect a type's schema / valid statuses**: `mcp__nimbalyst-trackers__tracker_list_types`.
 
 ## ⚠️ Don't forget to update the issue again!
 

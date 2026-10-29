@@ -63,7 +63,7 @@ Before sending any message, run the check: *am I about to ask the user something
 
 Pick the tool from what this session actually exposes, in this order:
 
-- **Nimbalyst** → `mcp__nimbalyst-mcp__AskUserQuestion` for a single 2–3 option choice; `mcp__nimbalyst-mcp__PromptForUserInput` for anything richer (multiSelect, singleSelect, reorder, editText, paired confirm).
+- **Nimbalyst** → `mcp__nimbalyst__AskUserQuestion` for a single 2–3 option choice; `mcp__nimbalyst__PromptForUserInput` for anything richer (multiSelect, singleSelect, reorder, editText, paired confirm).
 - **IDE extension (VS Code / JetBrains) or any other harness** → whatever interactive prompt tool that harness exposes.
 - **Claude Code / CLI** → the built-in `AskUserQuestion` tool.
 - **No interactive tool available** → plain text question, and only then.
@@ -78,12 +78,12 @@ Always offer an "other"/free-text escape so the user can answer beyond the optio
 
 Text written between tool calls can be replaced by a short summary, so the user never sees the text you wrote. Tests and issue reports (anthropics/claude-code#74558 and #65051) show this on Fable 5, Fable 5.1, and Opus 5.5. Reports also show it on Opus 5, and on Opus 4.8 before MCP tool calls. The docs list Sonnet 5.5 and Mythos 5.1 as progress-update models, but no test confirms the loss there. These rules apply on every model.
 
-The loss affects all user-facing text, not only questions. Text before the first tool call is safer than mid-turn text, but tests still lost it (Fable 5: 2 of 4 markers; Fable 5.1: about 6%). Final messages were almost never affected (0 of the controlled markers; about 0.4% on Fable 5.1). You MUST put everything the user needs to read in the final message of the turn, after the last tool call. You MUST NOT write user-facing text before or between tool calls.
+The loss affects all user-facing text, not only questions. Text before the first tool call is safer than mid-turn text, but tests still lost it (Fable 5: 2 of 4 markers; Fable 5.1: about 6%). Final messages were almost never affected (0 of the controlled markers; about 0.4% on Fable 5.1). You MUST put everything the user needs to read in the final message of the turn, after the last tool call. You MUST NOT write user-facing text before or between tool calls, except context for a prompt (see "The context is longer" below).
 
 When a question needs context first:
 
 - **The context fits the prompt (4 sentences or fewer per field).** Put it in the question and its options, and ask now. The prompt MUST be self-contained.
-- **The context is longer.** End the turn with the context as the final message. End that message by naming the decision that is waiting, as a statement and not a question. For example: Waiting on your decision about X. Ask the full question through the prompt tool in the next turn, after you answer the user's message.
+- **The context is longer.** Write the context, then call the prompt tool right after it, in the same turn. This is the one exception to the rule against text between tool calls. End the context with a fixed last line, for example: End of report: 2 blockers, 3 open items. The prompt MUST still be self-contained. Its intro, or its first question when the tool has no intro, MUST quote that last line. It tells the user to answer with the free-text option if that line is not visible. Do not add a separate option or field for this. If the user answers that way, end the turn with the context as the final message. End that message by naming the decision that is waiting, as a statement and not a question. For example: Waiting on your decision about X. Ask again after the user's reply.
 - **The question cannot wait.** Ask it mid-turn with a self-contained prompt. The longer context goes in the final message as information only.
 
 Before you ask, you MUST write every answer, finding, and recommendation that does not depend on the user's decision. You MUST NOT hold any back until after the question.
