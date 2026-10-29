@@ -76,9 +76,7 @@ Always offer an "other"/free-text escape so the user can answer beyond the optio
 
 ## Where user-facing text goes
 
-Text written between tool calls can be replaced by a short summary, so the user never sees the text you wrote. Tests and issue reports (anthropics/claude-code#74558 and #65051) show this on Fable 5, Fable 5.1, and Opus 5.5. Reports also show it on Opus 5, and on Opus 4.8 before MCP tool calls. The docs list Sonnet 5.5 and Mythos 5.1 as progress-update models, but no test confirms the loss there. These rules apply on every model.
-
-The loss affects all user-facing text, not only questions. Text before the first tool call is safer than mid-turn text, but tests still lost it (Fable 5: 2 of 4 markers; Fable 5.1: about 6%). Final messages were almost never affected (0 of the controlled markers; about 0.4% on Fable 5.1). You MUST put everything the user needs to read in the final message of the turn, after the last tool call. You MUST NOT write user-facing text before or between tool calls, except context for a prompt (see "The context is longer" below).
+Text written before or between tool calls can be replaced by a short summary, so the user never sees it. The final message of the turn is almost never affected. This holds on every model and for all user-facing text, not only questions. You MUST put everything the user needs to read in the final message of the turn, after the last tool call. You MUST NOT write user-facing text before or between tool calls, except context for a prompt (see "The context is longer" below).
 
 When a question needs context first:
 
