@@ -39,6 +39,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 When asked to check, look, explore, search, see, verify, validate, or any other read-only verb — report findings only. Never modify, implement, or fix anything without explicit confirmation first.
 
+A question works the same way: the answer is the result. Answer it in full first. Change only what the message explicitly asks to change. Propose a commit only when the current message asks for one. Stay proactive: when your answer leads to edits, offer them in an interactive prompt after the answer (see "Where user-facing text goes").
+
 ## Communication
 
 Understand the real intention behind the request before acting. Be direct, clear, and concise. Avoid repetition. Never soften findings — state problems and severity directly. Don't qualify with "probably," "might be worth," or "it could be argued" unless genuine uncertainty exists.
