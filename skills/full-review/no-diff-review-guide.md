@@ -5,9 +5,14 @@ resolved `diff = no` and the scope. Steps 8–9 (adversarial challenge, aggregat
 apply the same way to both modes and stay in `SKILL.md`; only the per-dimension checks
 below differ from `diff-review-guide.md`.
 
+**Findings format.** In every step below, list each finding as a row in a table with the
+columns `# | Finding | Severity | Evidence`. Rate Severity with the scale in `SKILL.md`
+("Severity"). Where a step delegates to another skill, keep the delegate's findings
+verbatim and add the mapped Severity column. A step with no findings shows no table.
+
 ### 2. Functional correctness
 
-Run the test suite scoped to the target path where the project's test runner supports
+A failing test suite is a Critical finding. Run the test suite scoped to the target path where the project's test runner supports
 path/package filtering (e.g. `pytest src/auth/`, `go test ./auth/...`, a workspace
 filter for a monorepo package) — a small scope inside a large monorepo shouldn't pay for
 the whole suite. Fall back to the full project suite, with a stated reason, only when
@@ -44,7 +49,7 @@ vacuous — say so and skip. If one exists, check whether the scope's **current*
 implementation fulfills it: report (a) documented behavior missing or partial, (b)
 undocumented capability beyond what the doc describes, (c) documented behavior that
 looks implemented but wrong — same three-part shape as the diff-relative check, just
-evaluated against current state instead of a diff.
+evaluated against current state instead of a diff. Give each flag a Severity.
 
 This step has no Acceptance Criteria sub-check analog — that sub-check is inherently
 diff-relative (see `diff-review-guide.md` Step 3).
@@ -59,7 +64,9 @@ accumulated across many past changes that a single-diff check would never see. F
 contradicts current behavior, (c) a command/skill/script present in the scope without
 being listed alongside its siblings wherever similar items are already listed — same
 flag categories as the diff-relative check, read as static facts about the current
-state rather than about a diff.
+state rather than about a diff. Rate each flag by what a reader would get wrong: a doc
+that contradicts current behavior is usually Major, documented behavior with no actual
+behavior is usually Major, and a missing sibling listing is usually Minor.
 
 ### 5. Code quality and decay risks
 
@@ -101,8 +108,9 @@ evaluate.
 definitions, page/view files, JSX/template patterns — same method as Step 2's runtime
 surface check). If found, run `/ux-expert` in audit mode on the scope's current UI.
 `/ux-expert` audits across its 8 UX dimensions, rating each finding
-Critical/Major/Minor/Enhancement; present its findings verbatim. Constrain it to its
-audit phases (Understand + Audit) — never enter the redesign/spec phases here.
+Critical/Major/Minor/Enhancement; present its findings verbatim, with the mapped Severity
+column added. Constrain it to its audit phases (Understand + Audit) — never enter the
+redesign/spec phases here.
 
 **Step B — If no UI surface exists in the scope** (pure backend, types, config, or
 docs): do not silently skip. Actively check whether a UI *should* exist — the scope may
@@ -122,10 +130,10 @@ this step:
 
 - **UI expected but missing** — the spec or code clearly implies a user-facing surface
   that this scope does not contain. Flag this as a gap: name the expected UI and mark it
-  unaddressed.
+  unaddressed. Severity: Major.
 - **UI status unclear** — the spec or code is ambiguous about whether a UI is needed.
   Flag the uncertainty: state what was checked and what remains unresolved so the
-  reviewer can confirm intent.
+  reviewer can confirm intent. Severity: Moderate.
 - **No UI needed** — the scope is clearly internal (background service, migration,
   infrastructure, pure library, CLI tool with no user-facing surface). State the specific
   reason this was determined, not just the label.

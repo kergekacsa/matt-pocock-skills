@@ -5,10 +5,16 @@ For a PR, commit range, branch/tag, or uncommitted/staged changes — Step 1 (in
 challenge, aggregate report) apply the same way to both modes and stay in `SKILL.md`;
 only the per-dimension checks below differ from `no-diff-review-guide.md`.
 
+**Findings format.** In every step below, list each finding as a row in a table with the
+columns `# | Finding | Severity | Evidence`. Rate Severity with the scale in `SKILL.md`
+("Severity"). Where a step delegates to another skill, keep the delegate's findings
+verbatim and add the mapped Severity column. A step with no findings shows no table.
+
 ### 2. Functional correctness
 
 - Run the project's real test suite. Record pass/fail — don't proceed past a failing
-  suite without flagging it as a blocker in the final report. If the project has no
+  suite without flagging it as a blocker in the final report. A failing suite is a
+  Critical finding. If the project has no
   test suite and no invocable build (e.g. a documentation/markdown-only repo with
   nothing executable), say so explicitly and mark this dimension not applicable —
   never imply a pass or fabricate a result for a suite that doesn't exist.
@@ -25,7 +31,7 @@ if the user confirms there is no spec, skip this step and note it.
 
 Spawn **one** subagent with `/code-review-matt`'s Spec sub-agent brief — report
 (a) requirements missing or partial, (b) unasked-for scope creep, (c) requirements that
-look implemented but wrong, each with a spec-line citation. Do **not** spawn or reuse
+look implemented but wrong, each with a spec-line citation and a Severity. Do **not** spawn or reuse
 `code-review-matt`'s Standards sub-agent — that axis is covered more thoroughly by Step 5,
 and running both would report the same smells twice.
 
@@ -42,6 +48,7 @@ explicitly which of these applies:
 - **AC status** — a ticket with an AC section exists: extract it and check each AC
   individually against the diff, regardless of what the generic spec source above turned
   out to be, and report per-AC status (met / partial / unaddressed), quoting each AC.
+  Rate every partial or unaddressed AC in a Severity column; a met AC needs none.
 
 This is the only place AC coverage is derived — `/wrap-up` consumes this section rather
 than re-deriving it, and relies on the reason always being stated explicitly to tell "no
@@ -56,7 +63,10 @@ For every behavioral change in the diff, identify the docs that describe that be
 API docs, and any HTML pages. Check whether each was actually updated to match. Flag:
 (a) changed behavior with no corresponding doc update, (b) a doc that now contradicts
 the new behavior, (c) a new command/skill/script added without being listed alongside
-its siblings wherever similar items are already listed. This mirrors the repo's own
+its siblings wherever similar items are already listed. Rate each flag by what a reader
+would get wrong: a doc that contradicts the new behavior is usually Major, changed
+behavior with no doc update is usually Moderate, and a missing sibling listing is usually
+Minor. This mirrors the repo's own
 "Documentation stays current" rule — outdated documentation is a bug, not a nice-to-have.
 If nothing in the diff changes documented or user-visible behavior, say so and skip.
 
@@ -94,8 +104,9 @@ audit would be redundant with it.
 **Step A — Detect a rendered UI surface.** Grep the diff for component/route definitions,
 template or JSX changes, page or view files. If found, run `/ux-expert` in audit mode on
 the changed surface. `/ux-expert` audits across its 8 UX dimensions and rates each
-finding Critical/Major/Minor/Enhancement; present its findings verbatim. Constrain it to
-its audit phases (Understand + Audit) — never enter the redesign/spec phases here.
+finding Critical/Major/Minor/Enhancement; present its findings verbatim, with the mapped
+Severity column added. Constrain it to its audit phases (Understand + Audit) — never
+enter the redesign/spec phases here.
 
 **Step B — If no UI surface exists in the diff** (backend-only, config-only, or
 docs-only): do not silently skip. Actively check whether a UI *should* have been
@@ -115,10 +126,10 @@ this step:
 
 - **UI expected but missing** — the ticket or code clearly implies a user-facing surface
   that was not delivered. Flag this as a gap: name the expected UI and mark it
-  unaddressed.
+  unaddressed. Severity: Major.
 - **UI status unclear** — the ticket or code is ambiguous about whether a UI is needed.
   Flag the uncertainty: state what was checked and what remains unresolved so the
-  reviewer can confirm intent.
+  reviewer can confirm intent. Severity: Moderate.
 - **No UI needed** — the change is clearly internal (background job, migration,
   infrastructure, internal library, CLI tool with no user-facing surface). State the
   specific reason this was determined, not just the label.

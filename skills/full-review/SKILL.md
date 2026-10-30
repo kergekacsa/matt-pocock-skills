@@ -65,6 +65,41 @@ provides, and never runs two skills that would find the same thing twice.
   message, and end the turn only for a question to the user, the final report, or when
   only a background task remains.
 
+## Severity
+
+Every finding in Steps 2–8 and in the Step 9 aggregate report MUST carry exactly one
+severity from this scale. A dedicated **Severity** column holds it — never fold it into
+the finding's prose.
+
+| Severity | Meaning |
+|---|---|
+| Critical | Breaks correctness, security, or safety. Data loss, breach, outage, or a failing test suite. |
+| Major | Significant design flaw, missing requirement, or likely bug. Fix before shipping. |
+| Moderate | Suboptimal but workable. |
+| Minor | Style, naming, or nitpick. |
+
+Rate each finding by its consequence, honestly. Never inflate a rating to draw attention.
+A step with no findings states that in one line and shows no table.
+
+Delegated skills rate findings on their own scales. Keep the delegate's finding text and
+rating unchanged, and map its rating to this scale in the Severity column:
+
+| Delegate rating | Severity |
+|---|---|
+| `/brooks-review`, `/brooks-test`, `/brooks-audit`: 🔴 Critical | Critical |
+| Same skills: 🟡 Warning | Moderate |
+| Same skills: 🟢 Suggestion | Minor |
+| `/brooks-debt`: Critical debt (Pain × Spread 7–9) | Critical |
+| `/brooks-debt`: Scheduled debt (4–6) | Moderate |
+| `/brooks-debt`: Monitored debt (1–3) | Minor |
+| `/ux-expert`: Critical, Major, Minor | Same name |
+| `/ux-expert`: Enhancement | Minor |
+| `/da-review`: Critical, Major | Same name |
+
+`/da-review` assigns no severity to its Assumptions, Blind Spots, and Hallucination Risk
+Flags items. Rate those with the scale above and leave `/da-review`'s own Blocking value
+unchanged.
+
 ## Process
 
 Step 1 below resolves which mode applies. Steps 2–7a — the per-dimension checks — live
@@ -149,7 +184,8 @@ Read `diff-review-guide.md` (diff = yes) or `no-diff-review-guide.md` (diff = no
 this directory and follow its Steps 2–7a in order: functional correctness, spec
 compliance, documentation completeness, code quality and decay risks, test quality,
 architecture impact, and UI/UX quality (Step 7a — always runs: either audits the
-existing UI surface, or checks whether a UI should have been delivered).
+existing UI surface, or checks whether a UI should have been delivered). Each guide
+lists that step's findings in a table with a Severity column (see "Severity" above).
 
 ### 8. Adversarial challenge
 
@@ -169,6 +205,11 @@ spin up a subagent for a one-liner") — passing the size signal explicitly lets
 that call on real numbers instead of inferring from an unmeasured file set. It is never
 skipped outright. Note whether it ran inline or delegated, and why.
 
+After `/da-review`'s report, list its numbered items in a table with the columns
+`# | Finding | Severity | Blocking?`. Use `/da-review`'s own item numbers and Blocking
+values. Copy Severity for Critical and Major items, and rate the Assumptions, Blind Spots,
+and Hallucination Risk Flags items yourself (see "Severity").
+
 ### 9. Aggregate report
 
 Write this yourself, every time — a delegated sub-skill's own report is not a
@@ -176,11 +217,21 @@ substitute for it, even when that sub-skill was the last thing that ran (see
 "Delegating a dimension is not finishing the review" above). One report, sectioned
 exactly as above in order, omitting any step that was skipped (with a one-line reason). Render each dimension's step name as a Markdown header using
 the project's bold-header convention (e.g. `## **2. Functional correctness**`, not plain
-bold text or a plain paragraph line) — see `references/formatting.md`. Close with a
-single paragraph stating whether every checked dimension came back clean. This skill
-states facts, not a merge decision — the human or calling process decides whether to
-merge; this report just says what each dimension found.
+bold text or a plain paragraph line) — see `references/formatting.md`. Each section
+keeps its findings table with the Severity column.
 
-For **plan-review** mode, the report has just two sections: the Step 1 mode/scope line,
-and Step 8's da-review result in full. The closing paragraph states whether the plan held
-up to challenge, not whether code is clean — there is no code.
+After the last section, add a `## **Findings by severity**` section. It holds one table
+with every finding from Steps 2–8, sorted Critical, Major, Moderate, Minor, with the
+columns `# | Severity | Dimension | Finding`. Number the rows from 1 in sorted order.
+The Dimension column names the step, for example `5. Code quality`. If no step produced a
+finding, write "No findings" in place of the table.
+
+Close with a single paragraph stating whether every checked dimension came back clean,
+and the highest severity found if any did not. This skill states facts, not a merge
+decision — the human or calling process decides whether to merge; this report just says
+what each dimension found.
+
+For **plan-review** mode, the report has just three sections: the Step 1 mode/scope line,
+Step 8's da-review result in full with its findings table, and the `Findings by severity`
+table built from it. The closing paragraph states whether the plan held up to challenge,
+not whether code is clean — there is no code.
