@@ -10,6 +10,8 @@ Forked from [mattpocock/skills](https://github.com/mattpocock/skills) and extend
 git clone https://github.com/kergekacsa/matt-pocock-skills ~/.claude
 ```
 
+Then merge [`settings_template.json`](./settings_template.json) into `~/.claude/settings.json` (the hook behind `safe-compact`). Do not overwrite your existing settings file.
+
 Then run `/setup-matt-pocock-skills` in your agent to configure per-repo settings (issue tracker, triage labels, domain doc layout).
 
 ## What's included
@@ -40,6 +42,7 @@ All skills live flat in `skills/` — Claude Code resolves them at `~/.claude/sk
 
 - **[grill-me](./skills/grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
 - **[handoff](./skills/handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
+- **[safe-compact](./skills/safe-compact/SKILL.md)** — Write a handoff document, then prepare `/compact` so the agent rereads `CLAUDE.md`, `CLAUDE.local.md`, the skills used this session, and the handoff afterwards. Needs the `SessionStart` hook from [`settings_template.json`](./settings_template.json).
 - **[teach](./skills/teach/SKILL.md)** — Teach a new skill or concept over multiple sessions.
 - **[writing-great-skills](./skills/writing-great-skills/SKILL.md)** — Reference for writing and editing skills well.
 - **[grilling](./skills/grilling/SKILL.md)** — Reusable interview loop behind `grill-me` and `grill-with-docs`.
@@ -77,6 +80,10 @@ Book-grounded code-review skills that diagnose decay against twelve classic engi
 
 - **[da-review](./commands/da-review.md)** — `/da-review` entry point for the devils-advocate skill.
 - **brooks-{[review](./commands/brooks-review.md), [audit](./commands/brooks-audit.md), [debt](./commands/brooks-debt.md), [test](./commands/brooks-test.md), [health](./commands/brooks-health.md), [sweep](./commands/brooks-sweep.md)}** — `/brooks-*` entry points for the Brooks-Lint codebase-health skills.
+
+### `settings_template.json`
+
+Settings that skills in this repo depend on. Merge its content into `~/.claude/settings.json`. Do not overwrite your existing file. Currently it holds the `SessionStart` hook (matcher `compact`) that `safe-compact` needs. The hook is a shell one-liner that needs `sh`, `grep`, and `cut`. These exist on macOS, Linux, and Git Bash on Windows. It uses `asyncRewake` to wake the agent right after `/compact`, so you do not need to send a message first. The Claude Code docs do not document `asyncRewake` for `SessionStart`. It works on Claude Code 2.1.312. Nimbalyst does not display the agent's final one-line confirmation after the wake. The Claude Code transcript still holds it.
 
 ### `references/`
 

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "asyncRewake": true,
+            "command": "f=\"$HOME/.claude/safe-compact-$(grep -o '\"session_id\": *\"[^\"]*\"' | cut -d'\"' -f4).md\"; if [ -f \"$f\" ]; then cat \"$f\" >&2; rm \"$f\"; exit 2; fi; true"
+          }
+        ]
+      }
+    ]
+  }
+}
