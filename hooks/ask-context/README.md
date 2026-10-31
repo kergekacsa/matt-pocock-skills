@@ -14,7 +14,7 @@ The hook runs before an `AskUserQuestion` call and before a `PromptForUserInput`
 
 | Gate | Blocks |
 |------|--------|
-| G1 | A question or form text that points at unseen context, such as "with that context" or "see above". An option description is not checked when its question (or the form intro) has 200 or more characters, because "above" then points at that text. |
+| G1 | A question or form text that points at unseen context, such as "with that context" or "see above". Option labels, item titles and option descriptions are checked too, but not when their question (or the form intro) has 200 or more characters, because "above" then points at that text. |
 | G2 | The same question text with the same option labels (or the same form) asked again after you answered in free text (an Other answer in a form), dismissed it, or never answered. A repeat after you picked an offered option is allowed. Any other repeat is blocked once, and the agent rewrites the question. G2 looks at the whole session. |
 | G3 | A mid-turn question when the payload has fewer than 200 characters of context and fewer than 200 characters of the agent's text reached the transcript since the last tool result. The payload counts question or form text, option labels, descriptions, previews, item titles and starting texts. A question right after your message is exempt. Only tool calls that already have a result count as earlier work, and a question you answered with an offered option does not count, so a series of questions passes. |
 

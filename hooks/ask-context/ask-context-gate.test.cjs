@@ -505,6 +505,34 @@ for (const phrase of G1_PHRASES) {
   });
 }
 
+test('G1 blocks a pointer in an option label', () => {
+  const input = payload('Which?', ['Apply the findings above', 'Skip']);
+  const r = run({ input });
+  assert.equal(r.blocked, true);
+  assert.match(r.reason, /\[G1\]/);
+  assert.match(r.reason, /option label/);
+});
+
+test('G1 blocks a pointer in a form option label and in an item title', () => {
+  const byLabel = formPayload('Choose.');
+  byLabel.fields[0].options[0].label = 'Use the analysis I provided';
+  assert.equal(run({ tool: FORM, input: byLabel }).blocked, true);
+  const byTitle = formPayload('Choose.', { items: [{ id: 'x', title: 'Per the above' }] });
+  const r = run({ tool: FORM, input: byTitle });
+  assert.equal(r.blocked, true);
+  assert.match(r.reason, /option label/);
+});
+
+test('G1 skips option labels when the question has 200+ characters', () => {
+  const input = payload(`Which one? ${LONG}`, ['Apply the findings above', 'Skip']);
+  assert.equal(run({ input }).blocked, false);
+});
+
+test('a deictic option label cannot supply the G3 context', () => {
+  const input = payload('Which?', ['Apply the findings above to every file in the repo '.repeat(5), 'Skip']);
+  assert.equal(run({ input, entries: midWork(input) }).blocked, true);
+});
+
 test('G1 skips option descriptions at exactly 200 question characters, and checks them at 199', () => {
   const at200 = payload('q'.repeat(200), ['A', 'B'], 'See above.');
   const at199 = payload('q'.repeat(199), ['A', 'B'], 'See above.');

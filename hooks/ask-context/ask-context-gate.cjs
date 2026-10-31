@@ -144,6 +144,7 @@ function questionStrings(toolInput, minVisible) {
     for (const t of unit.main) out.push([unit.where, t]);
     if (unit.lead.length >= minVisible) continue;
     for (const t of unit.details) out.push(['option description', t]);
+    for (const t of unit.labels) out.push(['option label', t]);
   }
   return out;
 }
