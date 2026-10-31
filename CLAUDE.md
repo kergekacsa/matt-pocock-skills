@@ -134,8 +134,7 @@ If you discover a bug as a side effect of other work — not the session's own t
 
 - SOLID principles and Clean Code — no code smells
 - Design modules deep, not just SOLID-compliant: a small interface hiding a large implementation, per `skills/codebase-design/SKILL.md`'s vocabulary (module, interface, depth, seam). Prefer fewer, deeper modules over splitting responsibilities into many shallow ones
-- Comments explain non-obvious why, invariants, or trade-offs — never restate what the code shows. Delete any comment a competent reader could infer from the code alone
-- A comment states a fact true of the code as it stands, never a fact about its history: don't cite an issue/PR/ticket number, a review round, or what an earlier version did or got wrong. That record already lives in commit history and version control — repeating it in source only rots when the code changes again and nobody updates the callout. (Sometimes called a "journal comment" — a changelog embedded in the file, a practice obsolete since source control exists to do that job.)
+- A comment states only what the code alone cannot show about what it does: a contract, an invariant, a unit, or a constraint that holds now (for example, a rate limit the code must respect). A comment MUST NOT record a decision, the reason for an approach, a trade-off, or history (issue/PR/ticket numbers, review rounds, what an earlier version did or got wrong). Record these in the related issue, or in the commit message when no issue exists. A `TODO`/`FIXME`, a `@deprecated` notice, and a license header are allowed. A short pointer to an ADR, design doc, or issue is allowed for a cross-file invariant that nothing else documents. Delete any comment a competent reader could infer from the code alone
 - Resolve all compiler warnings before closing a task
 - Avoid magic numbers — use descriptive named constants
 - Fix failing tests before moving on to the next task
