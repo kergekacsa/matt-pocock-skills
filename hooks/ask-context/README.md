@@ -15,8 +15,8 @@ The hook runs before an `AskUserQuestion` call and before a `PromptForUserInput`
 | Gate | Blocks |
 |------|--------|
 | G1 | A question or form text that points at unseen context, such as "with that context" or "see above". An option description is not checked when its question (or the form intro) has 200 or more characters, because "above" then points at that text. |
-| G2 | The same question or form asked again right after you answered in free text (an Other answer in a form), dismissed it, or never answered. A repeat after you picked an offered option is allowed. Any other repeat is blocked once, and the agent rewrites the question. |
-| G3 | A mid-turn question when the payload has fewer than 200 characters of context and fewer than 200 characters of the agent's text reached the transcript since the last tool result. A question right after your message is exempt. Only tool calls that already have a result count as earlier work. |
+| G2 | The same question text with the same option labels (or the same form) asked again after you answered in free text (an Other answer in a form), dismissed it, or never answered. A repeat after you picked an offered option is allowed. Any other repeat is blocked once, and the agent rewrites the question. G2 looks at the whole session. |
+| G3 | A mid-turn question when the payload has fewer than 200 characters of context and fewer than 200 characters of the agent's text reached the transcript since the last tool result. The payload counts question or form text, option labels, descriptions, previews, item titles and starting texts. A question right after your message is exempt. Only tool calls that already have a result count as earlier work, and a question you answered with an offered option does not count, so a series of questions passes. |
 
 The hook fails open. A missing transcript, a malformed line, an unknown payload shape, or any error allows the call.
 
@@ -26,7 +26,9 @@ The hook fails open. A missing transcript, a malformed line, an unknown payload 
 |---------|-----------|--------|
 | Claude Code CLI | `AskUserQuestion` | Live on CLI 2.1.312, 2.1.314 and 2.1.316: G1, G2 (2.1.316) and G3 block, a long question passes, an error in the hook allows the call. A JSON deny shows a shorter red error than exit code 2. |
 | Claude desktop app (Code tab) | `AskUserQuestion` | Live on 2.1.309: G1 and G3. G2 not run. A later G1 test with the JSON deny shows the block as one collapsed "Failed" row, and the agent then asks again. |
-| Nimbalyst | `mcp__nimbalyst__AskUserQuestion`, `mcp__nimbalyst__PromptForUserInput` | Live for `AskUserQuestion`: G1, G2 and G3 (G1 again with the JSON deny). Live for `PromptForUserInput`: G1 with the JSON deny. G2 and G3 for forms only in unit tests and a replay of 21 real calls (none blocked). |
+| Nimbalyst | `mcp__nimbalyst__AskUserQuestion`, `mcp__nimbalyst__PromptForUserInput` | Live for `AskUserQuestion`: G1, G2 and G3 (G1 again with the JSON deny). Live for `PromptForUserInput`: G1 with the JSON deny. G2 and G3 for forms only in unit tests. |
+
+A replay of 400 older sessions of one user (cut-off 2026-10-30 12:00, 813 forms and 1,339 questions) blocked 4 forms for G3 and 4 for G1, and blocked 3 questions for G3, 1 for G2 and 2 for G1. Nobody checked by hand whether each block was justified.
 
 Any MCP tool named `AskUserQuestion` works if it takes a `questions` array with `question` and `options`. Any MCP tool named `PromptForUserInput` works if it takes `title`, `intro` and a `fields` array.
 
@@ -34,8 +36,8 @@ Nimbalyst shows a blocked question as a "Questions Answered / Submitted" card, a
 
 ## Install
 
-1. Copy `ask-context-gate.cjs` to `~/.claude/hooks/`.
-2. Add this entry to `~/.claude/settings.json`, and keep the entries that are already there:
+1. Copy `ask-context-gate.cjs` to `~/.claude/hooks/ask-context/`. If you cloned this repo into `~/.claude`, the file is already there.
+2. Add this entry to `~/.claude/settings.json`, and keep the entries that are already there. The entry is also in `settings_template.json` at the root of this repo:
 
 ```json
 {
@@ -46,7 +48,7 @@ Nimbalyst shows a blocked question as a "Questions Answered / Submitted" card, a
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/hooks/ask-context-gate.cjs\"",
+            "command": "node \"$HOME/.claude/hooks/ask-context/ask-context-gate.cjs\"",
             "timeout": 10
           }
         ]
@@ -80,6 +82,8 @@ The tests need only Node. They ran on Node 22.
 - An agent can pad a question to reach the limit. Every block message tells the agent to write only facts the user needs to decide and not to pad. The message cannot prevent padding.
 - The hook finds the question being asked in the transcript. When the transcript does not contain it yet, an earlier identical question that has an answer is not mistaken for it.
 - The hook covers questions and forms only. User-facing text lost between tool calls, outside a question, is not covered.
+- The hook cannot see a long report that was lost when the question after it carries 200 or more characters. G3 passes that call, and nothing else signals the loss.
+- G2 has no override inside a session. A repeat that you ask for yourself is blocked as well. `ASK_CONTEXT_OFF=1` turns the hook off, and it needs a restart of the app.
 - Claude Code adds `PreToolUse:<tool> hook error:` to a block, and the CLI shows the block as a red error. No setting hides it.
 - A form answer in an edit-text field is not treated as free text. Only an Other answer of a single-select field is.
 

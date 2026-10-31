@@ -45,7 +45,7 @@ const payload = (question, labels = ['Yes', 'No'], description = '') => ({
   ],
 });
 
-function run({ tool = BUILTIN, input, entries, transcriptPath, env = {} }) {
+function run({ tool = BUILTIN, input, entries, transcriptPath, env = {}, toolUseId }) {
   let tp = transcriptPath;
   if (entries) {
     tp = path.join(tmp, `t-${++counter}.jsonl`);
@@ -56,6 +56,7 @@ function run({ tool = BUILTIN, input, entries, transcriptPath, env = {} }) {
     tool_name: tool,
     tool_input: input,
     transcript_path: tp,
+    ...(toolUseId === undefined ? {} : { tool_use_id: toolUseId }),
   });
   const r = spawnSync(process.execPath, [HOOK], {
     input: stdin,
@@ -172,7 +173,95 @@ test('G3 counts an earlier answered identical ask when the in-flight call is not
   const entries = [
     userMsg('ask me'),
     assistant(toolUse(BUILTIN, input, a)),
-    toolResult(a, 'Your questions have been answered: "Which one?"="Yes".'),
+    toolResult(a, 'Your questions have been answered: "Which one?"="what context?".'),
+  ];
+  assert.equal(run({ input, entries }).blocked, true);
+});
+
+function askedAndAnswered(answerText, { between = [] } = {}) {
+  const first = payload('Create a new branch for this fix?');
+  const next = payload('Which base branch?');
+  const a = nextId();
+  const entries = [
+    userMsg('fix the bug'),
+    assistant(toolUse(BUILTIN, first, a)),
+    toolResult(a, answerText),
+    ...between,
+    assistant(toolUse(BUILTIN, next, nextId())),
+  ];
+  return { input: next, entries };
+}
+
+test('G3 does not count a question the user answered with an offered option (question series)', () => {
+  const { input, entries } = askedAndAnswered('Your questions have been answered: "Create a new branch for this fix?"="Yes".');
+  assert.equal(run({ input, entries }).blocked, false);
+});
+
+test('G3 counts a question the user answered in their own words', () => {
+  const { input, entries } = askedAndAnswered('Your questions have been answered: "Create a new branch for this fix?"="why a branch?".');
+  assert.equal(run({ input, entries }).blocked, true);
+});
+
+test('G3 counts a question the user dismissed', () => {
+  const { input, entries } = askedAndAnswered(
+    "The user doesn't want to take this action right now. STOP what you are doing and wait for the user to tell you how to proceed.",
+  );
+  assert.equal(run({ input, entries }).blocked, true);
+});
+
+test('G3 still counts other tool calls in a question series', () => {
+  const x = nextId();
+  const { input, entries } = askedAndAnswered('Your questions have been answered: "Create a new branch for this fix?"="Yes".', {
+    between: [assistant(toolUse('Read', {}, x)), toolResult(x, 'ok')],
+  });
+  assert.equal(run({ input, entries }).blocked, true);
+});
+
+test('G3 limit is 200 characters: 199 blocks and 200 passes', () => {
+  const short = payload('q'.repeat(199 - 'YesNo'.length));
+  const exact = payload('q'.repeat(200 - 'YesNo'.length));
+  assert.equal(run({ input: short, entries: midWork(short) }).blocked, true);
+  assert.equal(run({ input: exact, entries: midWork(exact) }).blocked, false);
+});
+
+test('G3 counts option previews as payload context', () => {
+  const input = {
+    questions: [{ question: 'Which?', header: 'Q', multiSelect: false, options: [{ label: 'A', preview: LONG }, { label: 'B' }] }],
+  };
+  assert.equal(run({ input, entries: midWork(input) }).blocked, false);
+});
+
+test('G3 counts option labels as payload context', () => {
+  const input = payload('Which?', ['L'.repeat(110), 'M'.repeat(110)]);
+  assert.equal(run({ input, entries: midWork(input) }).blocked, false);
+});
+
+test('G3 starts a new turn at a user message that holds only an image', () => {
+  const input = payload('Which one?');
+  const a = nextId();
+  const imageOnly = {
+    type: 'user',
+    message: { role: 'user', content: [{ type: 'image', source: { type: 'base64', data: 'x' } }] },
+  };
+  const entries = [
+    userMsg('first'),
+    assistant(toolUse('Read', {}, a)),
+    toolResult(a, 'ok'),
+    imageOnly,
+    assistant(toolUse(BUILTIN, input, nextId())),
+  ];
+  assert.equal(run({ input, entries }).blocked, false);
+});
+
+test('G3 does not start a new turn at a user entry that holds only an image marker', () => {
+  const input = payload('Which one?');
+  const a = nextId();
+  const entries = [
+    userMsg('first'),
+    assistant(toolUse('Read', {}, a)),
+    toolResult(a, 'ok'),
+    userMsg('[Image: source: C:\\tmp\\shot.png]'),
+    assistant(toolUse(BUILTIN, input, nextId())),
   ];
   assert.equal(run({ input, entries }).blocked, true);
 });
@@ -325,11 +414,102 @@ test('G2 allows a repeat after the user picked an offered option', () => {
   assert.equal(run({ input, entries }).blocked, false);
 });
 
-test('G2 blocks a repeat after the prompt was dismissed', () => {
-  const { input, entries } = repeated("The user doesn't want to proceed with this tool use.");
-  const r = run({ input, entries });
-  assert.equal(r.blocked, true);
-  assert.match(r.reason, /dismissed/);
+const REAL_DISMISSALS = [
+  "The user doesn't want to take this action right now. STOP what you are doing and wait for the user to tell you how to proceed.",
+  "The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). STOP what you are doing and wait for the user to tell you how to proceed.",
+];
+
+for (const [i, dismissal] of REAL_DISMISSALS.entries()) {
+  test(`G2 blocks a repeat after the prompt was dismissed (real text ${i + 1})`, () => {
+    const { input, entries } = repeated(dismissal);
+    const r = run({ input, entries });
+    assert.equal(r.blocked, true);
+    assert.match(r.reason, /dismissed/);
+  });
+}
+
+test('G2 allows the same question text with different option labels', () => {
+  const probe = repeated('');
+  const { entries } = repeated(builtinResult(probe.input, 'what context?'));
+  const input = payload(question(probe.input), ['Option C', 'Option D']);
+  assert.equal(run({ input, entries }).blocked, false);
+});
+
+test('G2 matches a repeat that differs only in case, spacing and option order', () => {
+  const probe = repeated('');
+  const { entries } = repeated(builtinResult(probe.input, 'what context?'));
+  const input = payload(`  ${question(probe.input).toUpperCase().replace(/ /g, '  ')} `, ['Option B', 'Option A']);
+  assert.equal(run({ input, entries }).blocked, true);
+});
+
+test('G2 matches a repeat of several questions asked in another order', () => {
+  const q1 = { question: `First decision about caching? ${LONG}`, header: 'A', multiSelect: false, options: [{ label: 'Yes', description: '' }, { label: 'No', description: '' }] };
+  const q2 = { question: `Second decision about logging? ${LONG}`, header: 'B', multiSelect: false, options: [{ label: 'Yes', description: '' }, { label: 'No', description: '' }] };
+  const a = nextId();
+  const entries = [
+    userMsg('go'),
+    assistant(toolUse(BUILTIN, { questions: [q1, q2] }, a)),
+    toolResult(a, JSON.stringify({ cancelled: true })),
+    userMsg('hm'),
+  ];
+  assert.equal(run({ input: { questions: [q2, q1] }, entries }).blocked, true);
+});
+
+test('G2 drops the in-flight call by tool_use_id even when its input differs outside the key', () => {
+  const asked = payload(`Which option should the deploy use? ${LONG}`, ['Option A', 'Option B'], 'old description');
+  const current = payload(`Which option should the deploy use? ${LONG}`, ['Option A', 'Option B'], 'new description');
+  const id = nextId();
+  const entries = [userMsg('deploy it'), assistant(toolUse(BUILTIN, asked, id))];
+  assert.equal(run({ input: current, entries }).blocked, true);
+  assert.equal(run({ input: current, entries, toolUseId: id }).blocked, false);
+});
+
+test('G2 keeps an earlier answered ask when tool_use_id names a different call', () => {
+  const probe = repeated('');
+  const { input, entries } = repeated(builtinResult(probe.input, 'what context?'), { answered: true });
+  assert.equal(run({ input, entries, toolUseId: 'toolu_not_in_transcript' }).blocked, true);
+});
+
+test('G2 does not mix a form with a question that has the same text', () => {
+  const formInput = { fields: [{ type: 'confirm', id: 'ship', label: 'Ship it now? ' + LONG }] };
+  const questionInput = { questions: [{ question: 'Ship it now? ' + LONG, header: 'Q', multiSelect: false, options: [] }] };
+  const a = nextId();
+  const entries = [
+    userMsg('go'),
+    assistant(toolUse(FORM, formInput, a)),
+    toolResult(a, JSON.stringify({ cancelled: true })),
+    userMsg('hm'),
+  ];
+  assert.equal(run({ input: questionInput, entries }).blocked, false);
+});
+
+const G1_PHRASES = [
+  'with that context',
+  'with the above context',
+  'given the above',
+  'given this context',
+  'as described above',
+  'see above',
+  'per the above',
+  'based on my analysis above',
+  'the findings below',
+  'the analysis I provided',
+  'in light of the above',
+];
+
+for (const phrase of G1_PHRASES) {
+  test(`G1 blocks the phrase "${phrase}"`, () => {
+    const r = run({ input: payload(`Which one, ${phrase}?`) });
+    assert.equal(r.blocked, true);
+    assert.match(r.reason, /\[G1\]/);
+  });
+}
+
+test('G1 skips option descriptions at exactly 200 question characters, and checks them at 199', () => {
+  const at200 = payload('q'.repeat(200), ['A', 'B'], 'See above.');
+  const at199 = payload('q'.repeat(199), ['A', 'B'], 'See above.');
+  assert.equal(run({ input: at200 }).blocked, false);
+  assert.equal(run({ input: at199 }).blocked, true);
 });
 
 test('G2 blocks a repeat of a question that was never answered', () => {
@@ -500,6 +680,32 @@ test('forms: G3 counts option descriptions and item subtitles as payload context
   assert.equal(run({ tool: FORM, input: byOption, entries: midWork(byOption, { tool: FORM }) }).blocked, false);
   const byItems = formPayload('Choose.', { items: [{ id: 'x', title: 'X', subtitle: 'z'.repeat(220) }] });
   assert.equal(run({ tool: FORM, input: byItems, entries: midWork(byItems, { tool: FORM }) }).blocked, false);
+});
+
+test('forms: G3 counts option labels, item titles and edit-text initial text as payload context', () => {
+  const byLabel = formPayload('Choose.');
+  byLabel.fields[0].options = [
+    { id: 'a', label: 'a'.repeat(110) },
+    { id: 'b', label: 'b'.repeat(110) },
+  ];
+  const byItemTitle = formPayload('Choose.', { items: [{ id: 'x', title: 'T'.repeat(220) }] });
+  const byDraft = {
+    title: 'Approve',
+    intro: 'Approve the draft.',
+    fields: [{ type: 'editText', id: 'draft', label: 'Draft', initialText: 'd'.repeat(300) }],
+  };
+  for (const input of [byLabel, byItemTitle, byDraft]) {
+    assert.equal(run({ tool: FORM, input, entries: midWork(input, { tool: FORM }) }).blocked, false);
+  }
+});
+
+test('forms: G1 does not scan edit-text draft text', () => {
+  const input = {
+    title: 'Approve',
+    intro: 'Approve the draft.',
+    fields: [{ type: 'editText', id: 'draft', label: 'Draft', initialText: 'The details are described above in the ticket.' }],
+  };
+  assert.equal(run({ tool: FORM, input }).blocked, false);
 });
 
 test('forms: G3 allows a short form when 200+ characters of turn text were stored', () => {

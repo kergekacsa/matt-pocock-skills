@@ -10,7 +10,7 @@ Forked from [mattpocock/skills](https://github.com/mattpocock/skills) and extend
 git clone https://github.com/kergekacsa/matt-pocock-skills ~/.claude
 ```
 
-Then merge [`settings_template.json`](./settings_template.json) into `~/.claude/settings.json` (the hook behind `safe-compact`). Do not overwrite your existing settings file.
+Then merge [`settings_template.json`](./settings_template.json) into `~/.claude/settings.json` (the hooks behind `safe-compact` and `ask-context`). Do not overwrite your existing settings file.
 
 Then run `/setup-matt-pocock-skills` in your agent to configure per-repo settings (issue tracker, triage labels, domain doc layout).
 
@@ -81,9 +81,13 @@ Book-grounded code-review skills that diagnose decay against twelve classic engi
 - **[da-review](./commands/da-review.md)** — `/da-review` entry point for the devils-advocate skill.
 - **brooks-{[review](./commands/brooks-review.md), [audit](./commands/brooks-audit.md), [debt](./commands/brooks-debt.md), [test](./commands/brooks-test.md), [health](./commands/brooks-health.md), [sweep](./commands/brooks-sweep.md)}** — `/brooks-*` entry points for the Brooks-Lint codebase-health skills.
 
+### `hooks/`
+
+- **[ask-context](./hooks/ask-context/README.md)** — `PreToolUse` hook that blocks an `AskUserQuestion` or `PromptForUserInput` call when the user cannot see its context. Needs the `PreToolUse` entry from [`settings_template.json`](./settings_template.json). The file must sit at `~/.claude/hooks/ask-context/ask-context-gate.cjs`, which is where a clone into `~/.claude` puts it.
+
 ### `settings_template.json`
 
-Settings that skills in this repo depend on. Merge its content into `~/.claude/settings.json`. Do not overwrite your existing file. Currently it holds the `SessionStart` hook (matcher `compact`) that `safe-compact` needs. The hook is a shell one-liner that needs `sh`, `grep`, and `cut`. These exist on macOS, Linux, and Git Bash on Windows. It uses `asyncRewake` to wake the agent right after `/compact`, so you do not need to send a message first. The Claude Code docs do not document `asyncRewake` for `SessionStart`. It works on Claude Code 2.1.312. Nimbalyst does not display the agent's final one-line confirmation after the wake. The Claude Code transcript still holds it.
+Settings that skills and hooks in this repo depend on. Merge its content into `~/.claude/settings.json`. Do not overwrite your existing file. Currently it holds the `PreToolUse` hook for `ask-context` (matcher `AskUserQuestion$|PromptForUserInput$`). It also holds the `SessionStart` hook (matcher `compact`) that `safe-compact` needs. The hook is a shell one-liner that needs `sh`, `grep`, and `cut`. These exist on macOS, Linux, and Git Bash on Windows. It uses `asyncRewake` to wake the agent right after `/compact`, so you do not need to send a message first. The Claude Code docs do not document `asyncRewake` for `SessionStart`. It works on Claude Code 2.1.312. Nimbalyst does not display the agent's final one-line confirmation after the wake. The Claude Code transcript still holds it.
 
 ### `references/`
 

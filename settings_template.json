@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/hooks/ask-context-gate.cjs\"",
+            "command": "node \"$HOME/.claude/hooks/ask-context/ask-context-gate.cjs\"",
             "timeout": 10
           }
         ]

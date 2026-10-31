@@ -41,7 +41,7 @@ const fs = require('fs');
 const DEFAULT_MIN_VISIBLE_CHARS = 200;
 const TOOL_NAME_RE = /^(?:mcp__.+__)?(?:AskUserQuestion|PromptForUserInput)$/;
 const ANSWERED_MARKER = 'Your questions have been answered';
-const REJECTED_MARKER = "doesn't want to proceed";
+const REJECTED_RE = /doesn't want to (?:proceed|take this action)/;
 
 const DEICTIC_RE = new RegExp(
   [
@@ -105,7 +105,8 @@ const optionsOf = (question) => objectsIn(question.options);
 // The two payload shapes are `questions` (AskUserQuestion) and `fields` with `title` and `intro`
 // (PromptForUserInput). A unit is one question, or the whole form. `lead` is the text that must
 // stand alone, `main` is all text that asks, `details` are option descriptions and item
-// subtitles, `previews` are option previews.
+// subtitles, `previews` are option previews, `labels` are option labels and item titles, and
+// `drafts` are edit-text starting texts.
 function textUnits(toolInput) {
   const units = questionsOf(toolInput).map((q) => ({
     where: 'question',
@@ -113,6 +114,8 @@ function textUnits(toolInput) {
     main: [q.question].filter(isStr),
     details: optionsOf(q).map((o) => o.description).filter(isStr),
     previews: optionsOf(q).map((o) => o.preview).filter(isStr),
+    labels: optionsOf(q).map((o) => o.label).filter(isStr),
+    drafts: [],
   }));
   const fields = fieldsOf(toolInput);
   if (fields.length > 0) {
@@ -124,6 +127,10 @@ function textUnits(toolInput) {
         .flatMap((f) => [...optionsOf(f).map((o) => o.description), ...objectsIn(f.items).map((i) => i.subtitle)])
         .filter(isStr),
       previews: [],
+      labels: fields
+        .flatMap((f) => [...optionsOf(f).map((o) => o.label), ...objectsIn(f.items).map((i) => i.title)])
+        .filter(isStr),
+      drafts: fields.map((f) => f.initialText).filter(isStr),
     });
   }
   return units;
@@ -143,17 +150,21 @@ function questionStrings(toolInput, minVisible) {
 
 const normalizedText = (t) => t.replace(/\s+/g, ' ').trim().toLowerCase();
 
+// Question text with the sorted option labels. Empty when no unit has question text.
 function normalizedQuestionKey(toolInput) {
-  const keys = textUnits(toolInput).flatMap((unit) =>
-    unit.where === 'question' ? unit.main.map(normalizedText) : [unit.main.map(normalizedText).join('\u0001')],
-  );
-  if (keys.length === 0 || keys.every((k) => k === '')) return '';
+  const keys = textUnits(toolInput)
+    .filter((unit) => unit.main.some((t) => t.trim() !== ''))
+    .map((unit) => {
+      const text = unit.main.map(normalizedText).join('\u0001');
+      return text + '\u0002' + unit.labels.map(normalizedText).sort().join('\u0003');
+    });
+  if (keys.length === 0) return '';
   return (isForm(toolInput) ? 'form:' : '') + keys.sort().join('\u0000');
 }
 
 function payloadContextChars(toolInput) {
   return textUnits(toolInput)
-    .flatMap((unit) => [...unit.main, ...unit.details, ...unit.previews])
+    .flatMap((unit) => [...unit.main, ...unit.details, ...unit.previews, ...unit.labels, ...unit.drafts])
     .reduce((total, t) => total + t.trim().length, 0);
 }
 
@@ -234,8 +245,12 @@ function answeredToolIds(entries) {
   return ids;
 }
 
-// Asks without the in-flight call: the last ask, when it has the same input and no result yet.
-function dropCurrentCall(asks, toolInput, answeredIds) {
+// Asks without the in-flight call: the ask with the hook's tool_use_id, or else the last ask when
+// it has the same input and no result yet.
+function dropCurrentCall(asks, toolInput, answeredIds, toolUseId) {
+  if (isStr(toolUseId) && asks.some((a) => a.id === toolUseId)) {
+    return asks.filter((a) => a.id !== toolUseId);
+  }
   const last = asks[asks.length - 1];
   if (last && !answeredIds.has(last.id) && stableStringify(last.input) === stableStringify(toolInput)) {
     return asks.slice(0, -1);
@@ -316,7 +331,7 @@ const formAnswersMatchOptions = (answers) =>
 // 'offered' | 'free' | 'dismissed'
 function classifyResult(result, prevInput) {
   const parsed = parseJsonObject(result.text);
-  if (result.text.includes(REJECTED_MARKER) || (parsed && parsed.cancelled === true)) {
+  if (REJECTED_RE.test(result.text) || (parsed && parsed.cancelled === true)) {
     return 'dismissed';
   }
   const answers = result.structured || (parsed && isObj(parsed.answers) ? parsed.answers : null);
@@ -339,8 +354,9 @@ const hasToolResult = (entry) =>
   entry.type === 'user' && contentBlocks(entry).some((b) => b.type === 'tool_result');
 
 // Characters of assistant `text` blocks since the last tool result, and the number of tool calls
-// that already have a result. Blocks of type `thinking` never count.
-function turnVisibility(turnEntries, answeredIds) {
+// that already have a result. A question the user answered with an offered option does not count
+// as work. Blocks of type `thinking` never count.
+function turnVisibility(turnEntries, answeredIds, isOfferedAnswer) {
   let visibleChars = 0;
   let priorTools = 0;
   for (const entry of turnEntries) {
@@ -348,7 +364,7 @@ function turnVisibility(turnEntries, answeredIds) {
     if (entry.type !== 'assistant') continue;
     for (const block of contentBlocks(entry)) {
       if (block.type === 'text') visibleChars += (isStr(block.text) ? block.text : '').trim().length;
-      else if (block.type === 'tool_use' && answeredIds.has(block.id)) priorTools++;
+      else if (block.type === 'tool_use' && answeredIds.has(block.id) && !isOfferedAnswer(block)) priorTools++;
     }
   }
   return { visibleChars, priorTools };
@@ -376,10 +392,10 @@ function gateDeictic(toolInput, toolName, minVisible) {
   }
 }
 
-function gateRepeat(entries, toolInput, toolName, answeredIds) {
+function gateRepeat(entries, toolInput, toolName, answeredIds, toolUseId) {
   const wanted = normalizedQuestionKey(toolInput);
   if (wanted === '') return;
-  const asks = dropCurrentCall(collectAsks(entries), toolInput, answeredIds);
+  const asks = dropCurrentCall(collectAsks(entries), toolInput, answeredIds, toolUseId);
   for (let i = asks.length - 1; i >= 0; i--) {
     const ask = asks[i];
     if (normalizedQuestionKey(ask.input) !== wanted) continue;
@@ -399,8 +415,8 @@ function gateRepeat(entries, toolInput, toolName, answeredIds) {
       }
     }
     hardBlock(
-      `ASK-CONTEXT GATE [G2]: you already asked this exact question and ${reason}. ` +
-        'Asking the identical question again ignores their reply.\n\n' +
+      `ASK-CONTEXT GATE [G2]: you already asked this question with the same options and ${reason}. ` +
+        'Asking it again unchanged ignores their reply.\n\n' +
         `Fix: call ${toolName} again with a REWRITTEN payload that embeds the context ` +
         '(what is being decided, the key evidence as 2-6 short facts, and what each ' +
         'option implies) and that answers what the user actually said. Never re-send an ' +
@@ -411,14 +427,19 @@ function gateRepeat(entries, toolInput, toolName, answeredIds) {
 }
 
 function gateInvisibleContext(entries, toolInput, minVisible, toolName, answeredIds) {
-  const { visibleChars, priorTools } = turnVisibility(currentTurn(entries), answeredIds);
+  const isOfferedAnswer = (block) => {
+    if (!TOOL_NAME_RE.test(block.name || '') || !isObj(block.input)) return false;
+    const result = findResult(entries, -1, block.id);
+    return result !== null && classifyResult(result, block.input) === 'offered';
+  };
+  const { visibleChars, priorTools } = turnVisibility(currentTurn(entries), answeredIds, isOfferedAnswer);
   if (priorTools < 1) return;
   const payloadChars = payloadContextChars(toolInput);
   if (visibleChars >= minVisible || payloadChars >= minVisible) return;
   hardBlock(
     `ASK-CONTEXT GATE [G3]: you are mid-workstream (${priorTools} tool call(s) since the ` +
       `user's last message). This question payload carries only ${payloadChars} characters ` +
-      `of context (question text + option descriptions + previews), and only ${visibleChars} ` +
+      `of context (question text, option labels, descriptions, previews and starting texts), and only ${visibleChars} ` +
       'characters of your text since your last tool result reached the transcript. Whatever ' +
       'analysis exists is in your thinking and in collapsed tool output, so the user cannot see it.\n\n' +
       'Text written between tool calls is not a reliable surface: the API may deliver it as a ' +
@@ -456,7 +477,7 @@ function run(raw) {
   if (entries === null) return;
 
   const answeredIds = answeredToolIds(entries);
-  gateRepeat(entries, toolInput, toolName, answeredIds);
+  gateRepeat(entries, toolInput, toolName, answeredIds, data.tool_use_id);
   gateInvisibleContext(entries, toolInput, minVisible, toolName, answeredIds);
 }
 
