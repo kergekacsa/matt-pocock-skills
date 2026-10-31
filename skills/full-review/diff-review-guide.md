@@ -6,9 +6,12 @@ challenge, aggregate report) apply the same way to both modes and stay in `SKILL
 only the per-dimension checks below differ from `no-diff-review-guide.md`.
 
 **Findings format.** In every step below, list each finding as a row in a table with the
-columns `# | Finding | Severity | Evidence`. Rate Severity with the scale in `SKILL.md`
-("Severity"). Where a step delegates to another skill, keep the delegate's findings
-verbatim and add the mapped Severity column. A step with no findings shows no table.
+columns `ID | Finding | Severity | Evidence`. Assign each ID and write each Severity cell
+with the rules in `SKILL.md` ("Finding IDs" and "Severity"). Where a step delegates to
+another skill, keep the delegate's findings verbatim and add the ID and mapped Severity
+columns. Where the Finding IDs table in `SKILL.md` gives the Evidence cell as a finding's
+Action source, start that cell with `Action: <one imperative sentence>`. A step with no
+findings shows no table.
 
 ### 2. Functional correctness
 

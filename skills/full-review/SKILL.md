@@ -65,11 +65,48 @@ provides, and never runs two skills that would find the same thing twice.
   message, and end the turn only for a question to the user, the final report, or when
   only a background task remains.
 
+## Finding IDs
+
+Every finding in Steps 2–8 MUST carry one ID: a prefix and a number. The number starts at
+1 in each step and counts up. The step's table and the Step 9 summary table show the same
+ID for the same finding.
+
+| Prefix | Step | Action source |
+|---|---|---|
+| FN | 2. Functional correctness | Evidence cell |
+| SP | 3. Spec compliance | Evidence cell |
+| AC | 3. Acceptance Criteria coverage (its own sub-section) | Evidence cell |
+| DOC | 4. Documentation completeness | Evidence cell |
+| CQ | 5. Code quality and decay risks | `/brooks-*` Remedy |
+| TQ | 6. Test quality | `/brooks-test` Remedy |
+| AR | 7. Architecture impact | `/brooks-audit` Remedy |
+| UX | 7a. UI/UX quality | `/ux-expert` Recommendation. Step B outcomes: Evidence cell |
+| DA | 8. Adversarial challenge | `/da-review` Action |
+
+A finding whose Action source is the Evidence cell starts that cell with `Action: <one
+imperative sentence>`.
+
+DA IDs use `/da-review`'s own item numbers: `/da-review` item 3 is `DA-3`. `/da-review`
+prints these IDs in its report, so the summary ID matches the report.
+
+AC numbers follow the row order of the Acceptance Criteria coverage table, one number per
+criterion. Only partial and unaddressed criteria carry an `Action:` and appear in the
+Step 9 summary table. A met criterion keeps its number in the Step 3 table and has no
+`Action:` and no summary row.
+
 ## Severity
 
-Every finding in Steps 2–8 and in the Step 9 aggregate report MUST carry exactly one
+Every finding in Steps 2–8 and in the Step 9 summary table MUST carry exactly one
 severity from this scale. A dedicated **Severity** column holds it — never fold it into
 the finding's prose.
+
+A Blocking finding writes its Severity cell in bold with `/ Blocking` after the severity,
+for example `**Major / Blocking**`. All other findings write the severity name alone.
+Blocking is set by these rules:
+
+- Findings from Steps 2–7a: Critical and Major are Blocking. Moderate and Minor are not.
+- Findings from Step 8: copy `/da-review`'s own Blocking value. `Blocking: Yes` is
+  Blocking.
 
 | Severity | Meaning |
 |---|---|
@@ -205,10 +242,13 @@ spin up a subagent for a one-liner") — passing the size signal explicitly lets
 that call on real numbers instead of inferring from an unmeasured file set. It is never
 skipped outright. Note whether it ran inline or delegated, and why.
 
-After `/da-review`'s report, list its numbered items in a table with the columns
-`# | Finding | Severity | Blocking?`. Use `/da-review`'s own item numbers and Blocking
-values. Copy Severity for Critical and Major items, and rate the Assumptions, Blind Spots,
-and Hallucination Risk Flags items yourself (see "Severity").
+Invoke `/da-review` with this note: "Called from /full-review: omit the Recommended
+Actions table, and write each item number as DA-<number>, for example DA-3." The Step 9
+summary table lists its items instead. Show the rest of its report verbatim. Its items
+are this step's detail output, and Step 8 has no table of its own. The Severity of a
+Critical or Major item comes from the item. For the Assumptions, Blind Spots, and
+Hallucination Risk Flags items, rate the Severity yourself in the Step 9 summary table
+(see "Severity").
 
 ### 9. Aggregate report
 
@@ -217,14 +257,28 @@ substitute for it, even when that sub-skill was the last thing that ran (see
 "Delegating a dimension is not finishing the review" above). One report, sectioned
 exactly as above in order, omitting any step that was skipped (with a one-line reason). Render each dimension's step name as a Markdown header using
 the project's bold-header convention (e.g. `## **2. Functional correctness**`, not plain
-bold text or a plain paragraph line) — see `references/formatting.md`. Each section
-keeps its findings table with the Severity column.
+bold text or a plain paragraph line) — see `references/formatting.md`. Each section from
+Steps 2–7a keeps its findings table with the Severity column. Step 8 keeps `/da-review`'s
+report instead of a table.
 
-After the last section, add a `## **Findings by severity**` section. It holds one table
-with every finding from Steps 2–8, sorted Critical, Major, Moderate, Minor, with the
-columns `# | Severity | Dimension | Finding`. Number the rows from 1 in sorted order.
-The Dimension column names the step, for example `5. Code quality`. If no step produced a
-finding, write "No findings" in place of the table.
+After the last section, add a `## **Findings summary**` section. It holds the only
+summary table in the report, with every finding from Steps 2–8 and the columns
+`ID | Action | Severity | Dimension`:
+
+- **ID:** the finding's ID from its step (see "Finding IDs"), so the reader finds the
+  detail row by ID.
+- **Action:** the finding's Action source from the Finding IDs table. Shorten a delegate's
+  fix field to one sentence of fewer than 25 words. Where the source is the Evidence
+  cell, copy the `Action:` sentence word for word.
+- **Severity:** the same cell as the finding's detail row, including the bold
+  `/ Blocking` form (see "Severity"). Step 8 items have no detail row with a Severity
+  cell, so build the cell from the item's own Severity and Blocking values. For items
+  that carry no Severity, use your own rating.
+- **Dimension:** the step name, for example `5. Code quality`.
+
+Sort the rows by severity (Critical, Major, Moderate, Minor). Inside one severity, list
+Blocking findings first, then follow the step order of the Finding IDs table. If no step
+produced a finding, write "No findings" in place of the table.
 
 Close with a single paragraph stating whether every checked dimension came back clean,
 and the highest severity found if any did not. This skill states facts, not a merge
@@ -232,6 +286,6 @@ decision — the human or calling process decides whether to merge; this report 
 what each dimension found.
 
 For **plan-review** mode, the report has just three sections: the Step 1 mode/scope line,
-Step 8's da-review result in full with its findings table, and the `Findings by severity`
-table built from it. The closing paragraph states whether the plan held up to challenge,
+Step 8's da-review result in full (without its Recommended Actions table), and the
+`Findings summary` table built from it. The closing paragraph states whether the plan held up to challenge,
 not whether code is clean — there is no code.

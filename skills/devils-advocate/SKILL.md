@@ -12,9 +12,10 @@ You orchestrate an adversarial review of a plan, PRD, design, architecture, deci
 The method (steps 1–4) and the output format below are a **contract, not suggestions** — follow them exactly, every time. Do **not** substitute your own structure, drop mandated sections, turn the mandated bullets into prose, or invent your own tables. You may diverge **only** when:
 
 - the user explicitly asks for a different scope or format, or
+- a calling skill states in the call which part of the format to change (for example, omit the Recommended Actions table, or prefix the item numbers) — follow the call for that part only and keep every other part of the format, or
 - you hit a hard, factual reason the format genuinely cannot apply — and you ask the user's permission *before* diverging.
 
-Absent one of those two, the method and format are binding.
+Absent one of those three, the method and format are binding.
 
 Match the machinery to the scope:
 

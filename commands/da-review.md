@@ -8,4 +8,4 @@ Then review: $ARGUMENTS (if empty, review the current plan, code, or work in con
 
 Let the skill size itself to the target — a small, self-contained target gets a quick inline pass; a larger or higher-stakes one gets the full delegated review. Honor any scope the user states explicitly (e.g. "just a quick look", "full review").
 
-**Do not substitute your own format or skip the skill's mandated sections.** Follow the skill's output structure exactly.
+**Do not substitute your own format or skip the skill's mandated sections.** Follow the skill's output structure exactly. The one exception: a calling skill states in the arguments which part of the format to change. Follow that statement for that part only.

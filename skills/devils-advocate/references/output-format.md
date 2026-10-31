@@ -41,7 +41,7 @@ off at. What goes under each header:
 - **➕ Held back** — one line, only if the global cap trimmed anything.
 - **🏁 Verdict** (last line) — Ship it / Ship with changes / Rethink it. Always the final line of the report.
 
-Omit any of Critical, Major, Assumptions, Blind Spots, or Hallucination Risk Flags that genuinely has nothing — don't pad with "none found." Always keep ✅ What Holds Up, 📋 Recommended Actions, and the 🏁 Verdict.
+Omit any of Critical, Major, Assumptions, Blind Spots, or Hallucination Risk Flags that genuinely has nothing — don't pad with "none found." Always keep ✅ What Holds Up, 📋 Recommended Actions, and the 🏁 Verdict. One exception: when a calling skill states it in the call, omit 📋 Recommended Actions and write each item number with the prefix the caller names, for example `DA-3.`. The caller's own summary table lists the same items under the same IDs.
 
 ## Numbering
 
