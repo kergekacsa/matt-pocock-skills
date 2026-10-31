@@ -24,9 +24,11 @@ The hook fails open. A missing transcript, a malformed line, an unknown payload 
 
 | Harness | Tool name | Status |
 |---------|-----------|--------|
-| Claude Code CLI | `AskUserQuestion` | Live on CLI 2.1.312, 2.1.314 and 2.1.316: G1, G2 (2.1.316) and G3 block, a long question passes, an error in the hook allows the call. A JSON deny shows a shorter red error than exit code 2. |
-| Claude desktop app (Code tab) | `AskUserQuestion` | Live on 2.1.309: G1 and G3. G2 not run. A later G1 test with the JSON deny shows the block as one collapsed "Failed" row, and the agent then asks again. |
-| Nimbalyst | `mcp__nimbalyst__AskUserQuestion`, `mcp__nimbalyst__PromptForUserInput` | Live for `AskUserQuestion`: G1, G2 and G3 (G1 again with the JSON deny). Live for `PromptForUserInput`: G1 with the JSON deny. G2 and G3 for forms only in unit tests. |
+| Claude Code CLI | `AskUserQuestion` | Live on CLI 2.1.312, 2.1.314 and 2.1.316, before commit 6bbcb60 and with a project-level hook entry: G1, G2 (2.1.316) and G3 block, a long question passes, an error in the hook allows the call. A JSON deny shows a shorter red error than exit code 2. Live again on CLI 2.1.316 with the global entry and the code of 6bbcb60, in this repo folder: G1 and G3 block. The G2 fix and a passing long question are only in unit tests since then. |
+| Claude desktop app (Code tab) | `AskUserQuestion` | Live on 2.1.309, before commit 6bbcb60 and with a project-level hook entry: G1 and G3. G2 not run. A later G1 test with the JSON deny shows the block as one collapsed "Failed" row, and the agent then asks again. Live again with the global entry and the code of 6bbcb60 (app version not recorded): G1 and G3 each show a collapsed "Failed" row, and the agent then asks with the context in the question. The block text was not expanded. |
+| Nimbalyst | `mcp__nimbalyst__AskUserQuestion`, `mcp__nimbalyst__PromptForUserInput` | Live before commit 6bbcb60 and with a project-level hook entry: `AskUserQuestion` G1, G2 and G3, and `PromptForUserInput` G1. Live with the global entry and the code of 6bbcb60: `AskUserQuestion` G1 and G3. The G2 fix, forms and a long question that passes are only in unit tests since then. |
+
+The code and the wiring changed after most of these tests. Since commit 6bbcb60 the only hook entry is the global one in `~/.claude/settings.json`. A wrong path in that entry fails open without any sign, so check after every change that a call with "see above" in its question is blocked.
 
 A replay of 400 older sessions of one user (cut-off 2026-10-30 12:00, 813 forms and 1,339 questions) blocked 4 forms for G3 and 4 for G1, and blocked 3 questions for G3, 1 for G2 and 2 for G1. Nobody checked by hand whether each block was justified.
 
@@ -84,6 +86,7 @@ The tests need only Node. They ran on Node 22.
 - The hook covers questions and forms only. User-facing text lost between tool calls, outside a question, is not covered.
 - The hook cannot see a long report that was lost when the question after it carries 200 or more characters. G3 passes that call, and nothing else signals the loss.
 - G2 has no override inside a session. A repeat that you ask for yourself is blocked as well. `ASK_CONTEXT_OFF=1` turns the hook off, and it needs a restart of the app.
+- G3 blocks and does not ask for confirmation. In one live test in Nimbalyst (permission mode not recorded), a hook decision of `ask` showed no confirmation prompt, and the question appeared at once. A softer G3 with `ask` would then have no effect there.
 - Claude Code adds `PreToolUse:<tool> hook error:` to a block, and the CLI shows the block as a red error. No setting hides it.
 - A form answer in an edit-text field is not treated as free text. Only an Other answer of a single-select field is.
 
